@@ -1,0 +1,276 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    WHATSAPP TEMPLATES - COPY & PASTE                         ║
+║                    Ready to submit in Meta Business Manager                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+================================================================================
+TEMPLATE 1: CHECK-IN INFORMATION
+================================================================================
+Template Name: checkin_info
+Category: UTILITY
+Language: German (de)
+
+BODY TEXT (copy this):
+---
+Hallo {{1}},
+
+Willkommen bei {{2}}! 🏠
+
+Ihre Check-in Details:
+📅 Datum: {{3}}
+🕐 Zeit: {{4}}
+📍 Adresse: {{5}}
+🔑 Zugangscode: {{6}}
+
+Bei Fragen stehen wir Ihnen gerne zur Verfügung.
+
+Viele Grüße,
+GrandQuarters Team
+---
+
+SAMPLE VALUES (for Meta review):
+{{1}} = Max Mustermann
+{{2}} = Apartment Zentrum Wien
+{{3}} = 15.12.2025
+{{4}} = 15:00
+{{5}} = Hauptstraße 123, 1010 Wien
+{{6}} = 1234#
+
+
+================================================================================
+TEMPLATE 2: CHECK-OUT REMINDER
+================================================================================
+Template Name: checkout_reminder
+Category: UTILITY
+Language: German (de)
+
+BODY TEXT (copy this):
+---
+Hallo {{1}},
+
+Wir hoffen, Sie hatten einen angenehmen Aufenthalt bei {{2}}! 😊
+
+Ihre Check-out Details:
+📅 Datum: {{3}}
+🕐 Zeit: {{4}}
+
+Bitte:
+✅ Schlüssel im Apartment lassen
+✅ Alle Fenster schließen
+✅ Müll entsorgen
+
+Vielen Dank und gute Reise!
+GrandQuarters Team
+---
+
+SAMPLE VALUES:
+{{1}} = Max Mustermann
+{{2}} = Apartment Zentrum Wien
+{{3}} = 20.12.2025
+{{4}} = 11:00
+
+
+================================================================================
+TEMPLATE 3: BOOKING CONFIRMATION
+================================================================================
+Template Name: booking_confirmation
+Category: UTILITY
+Language: German (de)
+
+BODY TEXT (copy this):
+---
+Hallo {{1}},
+
+Ihre Buchung ist bestätigt! ✅
+
+🏠 Unterkunft: {{2}}
+📅 Check-in: {{3}}
+📅 Check-out: {{4}}
+🔖 Buchungsnummer: {{5}}
+
+Weitere Details erhalten Sie per E-Mail.
+
+Wir freuen uns auf Ihren Besuch!
+GrandQuarters Team
+---
+
+SAMPLE VALUES:
+{{1}} = Max Mustermann
+{{2}} = Apartment Zentrum Wien
+{{3}} = 15.12.2025
+{{4}} = 20.12.2025
+{{5}} = BK-2025-12345
+
+
+================================================================================
+TEMPLATE 4: FOLLOW-UP MESSAGE
+================================================================================
+Template Name: followup_message
+Category: UTILITY
+Language: German (de)
+
+BODY TEXT (copy this):
+---
+Hallo {{1}},
+
+Wir hoffen, Sie hatten einen wunderbaren Aufenthalt bei {{2}}! 🌟
+
+{{3}}
+
+Bei Fragen oder Anliegen melden Sie sich gerne bei uns.
+
+Beste Grüße,
+GrandQuarters Team
+---
+
+SAMPLE VALUES:
+{{1}} = Max Mustermann
+{{2}} = Apartment Zentrum Wien
+{{3}} = Vielen Dank für Ihre Bewertung! Wir würden uns freuen, Sie bald wieder begrüßen zu dürfen.
+
+
+================================================================================
+TEMPLATE 5: PAYMENT REMINDER (OPTIONAL)
+================================================================================
+Template Name: payment_reminder
+Category: UTILITY
+Language: German (de)
+
+BODY TEXT (copy this):
+---
+Hallo {{1}},
+
+Freundliche Erinnerung bezüglich Ihrer Buchung bei {{2}}.
+
+💳 Offener Betrag: €{{3}}
+📅 Fällig bis: {{4}}
+
+Bitte überweisen Sie den Betrag rechtzeitig.
+
+Bei Fragen stehen wir Ihnen gerne zur Verfügung.
+
+GrandQuarters Team
+---
+
+SAMPLE VALUES:
+{{1}} = Max Mustermann
+{{2}} = Apartment Zentrum Wien
+{{3}} = 250.00
+{{4}} = 10.12.2025
+
+
+================================================================================
+TEMPLATE 6: HOUSE RULES REMINDER (OPTIONAL)
+================================================================================
+Template Name: house_rules
+Category: UTILITY
+Language: German (de)
+
+BODY TEXT (copy this):
+---
+Hallo {{1}},
+
+Wichtige Hausregeln für {{2}}:
+
+🔇 Ruhezeiten: 22:00 - 08:00
+🚭 Rauchverbot in der Wohnung
+👥 Max. {{3}} Personen
+🐕 Haustiere: {{4}}
+
+Vielen Dank für Ihr Verständnis!
+
+GrandQuarters Team
+---
+
+SAMPLE VALUES:
+{{1}} = Max Mustermann
+{{2}} = Apartment Zentrum Wien
+{{3}} = 4
+{{4}} = nicht erlaubt
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              SUBMISSION CHECKLIST                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Before submitting each template:
+
+□ Category is set to "UTILITY"
+□ Language is set to "German (de)" or appropriate language
+□ All variables ({{1}}, {{2}}, etc.) are numbered sequentially
+□ Sample values are realistic and match the context
+□ No marketing/promotional content (use UTILITY for transactional only)
+□ No sensitive information in sample values
+□ Template is under 1024 characters
+□ Emojis are used sparingly
+□ Grammar and spelling are correct
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                            WHERE TO SUBMIT                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+1. Go to: https://business.facebook.com
+2. Select your Business Account
+3. Go to: WhatsApp Manager → Message Templates
+4. Click: "Create Template"
+5. Fill in: Template Name, Category, Language
+6. Paste: Body text from above
+7. Add: Sample values for each {{variable}}
+8. Submit: Click "Submit" button
+
+Review time: Usually 24 hours
+Status: Check email or WhatsApp Manager for approval
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              AFTER APPROVAL                                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Once approved, test each template:
+
+// Test Check-In Info
+await whatsappService.sendCheckInInfo(
+  '+YOUR_PHONE',
+  'Test Guest',
+  'Test Apartment',
+  '31.12.2025',
+  '15:00',
+  'Test Address',
+  'TEST123'
+);
+
+// Test Check-Out Reminder
+await whatsappService.sendCheckOutReminder(
+  '+YOUR_PHONE',
+  'Test Guest',
+  'Test Apartment',
+  '05.01.2026',
+  '11:00'
+);
+
+// Test Booking Confirmation
+await whatsappService.sendBookingConfirmation(
+  '+YOUR_PHONE',
+  'Test Guest',
+  'Test Apartment',
+  '31.12.2025',
+  '05.01.2026',
+  'TEST-12345'
+);
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                   NOTES                                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+✓ Templates are FREE to create and submit
+✓ Each template message costs ~€0.05 to send (outside 24h window)
+✓ Messages within 24h window are FREE (use sendMessage() instead)
+✓ Templates can be edited, but require re-approval
+✓ Rejected templates include a reason - fix and resubmit
+✓ You can have multiple language versions of the same template
+
+
+For more help: See WHATSAPP-TEMPLATES-GUIDE.md
+
