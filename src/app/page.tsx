@@ -211,7 +211,7 @@ export default function AdminChatPage() {
 
   const handleShowRawEmail = async (messageId: string) => {
     try {
-      const res = await fetch(`http://localhost:4000/api/messages/${messageId}/raw`)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'}/api/messages/${messageId}/raw`)
       const data = await res.json()
       if (data.hasRawData === false) {
         setRawEmailData({ noData: true })
