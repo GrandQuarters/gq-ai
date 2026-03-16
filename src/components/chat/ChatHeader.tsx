@@ -1,20 +1,33 @@
 "use client"
 
-import React from "react"
-import { Phone, Video, Info, ArrowLeft } from "lucide-react"
+import React, { useState } from "react"
+import { Phone, Video, Info, ArrowLeft, Sparkles } from "lucide-react"
 import type { Conversation } from "@/types/chat"
 
 interface ChatHeaderProps {
   conversation: Conversation
   onInfoClick: () => void
   onBackClick?: () => void
+  onGenerateAI?: () => Promise<void>
 }
 
 export default function ChatHeader({
   conversation,
   onInfoClick,
   onBackClick,
+  onGenerateAI,
 }: ChatHeaderProps) {
+  const [generating, setGenerating] = useState(false)
+
+  const handleGenerateAI = async () => {
+    if (!onGenerateAI || generating) return
+    setGenerating(true)
+    try {
+      await onGenerateAI()
+    } finally {
+      setGenerating(false)
+    }
+  }
   const participantText = conversation.online ? "Online" : "Offline"
 
   return (
@@ -77,14 +90,34 @@ export default function ChatHeader({
         </div>
       </div>
 
-      {/* Info Icon */}
-      <button
-        onClick={onInfoClick}
-        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        title="Info"
-      >
-        <Info className="h-5 w-5 text-gray-600" />
-      </button>
+      <div className="flex items-center gap-1">
+        {/* Generate AI Button */}
+        {onGenerateAI && (
+          <button
+            onClick={handleGenerateAI}
+            disabled={generating}
+            className="px-3 py-1.5 text-xs font-medium rounded-full transition-colors flex items-center gap-1.5"
+            style={{
+              background: generating ? '#e5e7eb' : 'linear-gradient(135deg, #D4A574, #8B6635)',
+              color: generating ? '#9ca3af' : '#fff',
+              cursor: generating ? 'not-allowed' : 'pointer',
+            }}
+            title="KI-Antwort generieren"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            {generating ? 'Generiert...' : 'KI Antwort'}
+          </button>
+        )}
+
+        {/* Info Icon */}
+        <button
+          onClick={onInfoClick}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          title="Info"
+        >
+          <Info className="h-5 w-5 text-gray-600" />
+        </button>
+      </div>
     </div>
   )
 }

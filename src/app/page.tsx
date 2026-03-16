@@ -352,6 +352,17 @@ export default function AdminChatPage() {
               conversation={selectedConversation}
               onInfoClick={() => setShowApartmentDetails(!showApartmentDetails)}
               onBackClick={() => setShowMobileChat(false)}
+              onGenerateAI={async () => {
+                try {
+                  const suggestion = await apiService.generateAiResponse(selectedConversation.id)
+                  if (suggestion) {
+                    setCurrentAISuggestion(suggestion)
+                    setIsAISuggestionVisible(true)
+                  }
+                } catch (error) {
+                  console.error('❌ Failed to generate AI response:', error)
+                }
+              }}
             />
 
             {/* Apartment Details Dropdown */}
