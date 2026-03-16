@@ -33,8 +33,14 @@ export default function ChatSidebar({
     c.name?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const pinnedConversations = filteredConversations.filter((c) => c.pinned)
-  const unpinnedConversations = filteredConversations.filter((c) => !c.pinned)
+  const sortByTime = (a: Conversation, b: Conversation) => {
+    const timeA = a.lastMessageTime ? new Date(a.lastMessageTime).getTime() : 0
+    const timeB = b.lastMessageTime ? new Date(b.lastMessageTime).getTime() : 0
+    return timeB - timeA
+  }
+
+  const pinnedConversations = filteredConversations.filter((c) => c.pinned).sort(sortByTime)
+  const unpinnedConversations = filteredConversations.filter((c) => !c.pinned).sort(sortByTime)
 
   const handleContextMenu = (e: React.MouseEvent, conversationId: string) => {
     e.preventDefault()

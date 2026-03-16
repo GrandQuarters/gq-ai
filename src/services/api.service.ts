@@ -18,6 +18,7 @@ export interface BackendConversation {
 export interface BackendMessage {
   id: string;
   content: string;
+  originalContent?: string | null;
   senderId: string;
   senderName: string;
   senderAvatar: string;
@@ -32,12 +33,16 @@ export class ApiService {
 
   async getConversations(): Promise<BackendConversation[]> {
     const response = await fetch(`${API_URL}/conversations`);
-    return response.json();
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
   }
 
   async getMessages(conversationId: string): Promise<BackendMessage[]> {
     const response = await fetch(`${API_URL}/conversations/${conversationId}/messages`);
-    return response.json();
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
   }
 
   async sendMessage(conversationId: string, content: string): Promise<void> {
@@ -58,7 +63,9 @@ export class ApiService {
 
   async getActionRequiredIds(): Promise<string[]> {
     const response = await fetch(`${API_URL}/action-required`);
-    return response.json();
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
   }
 
   connectWebSocket(onMessage: (data: any) => void): WebSocket {

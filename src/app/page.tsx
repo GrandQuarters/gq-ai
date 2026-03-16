@@ -26,6 +26,7 @@ export default function AdminChatPage() {
   const [actionRequiredIds, setActionRequiredIds] = useState<string[]>([])
   const [showMobileChat, setShowMobileChat] = useState(false)
   const [currentAISuggestion, setCurrentAISuggestion] = useState<string | null>(null)
+  const [rawEmailData, setRawEmailData] = useState<Record<string, any> | null>(null)
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -42,14 +43,20 @@ export default function AdminChatPage() {
     async function loadConversations() {
       try {
         const backendConversations = await apiService.getConversations()
-        setConversations(backendConversations as Conversation[])
+        if (Array.isArray(backendConversations)) {
+          setConversations(backendConversations as Conversation[])
+        }
         
         const actionIds = await apiService.getActionRequiredIds()
-        setActionRequiredIds(actionIds)
+        if (Array.isArray(actionIds)) {
+          setActionRequiredIds(actionIds)
+        }
         
         console.log('✅ Loaded conversations from backend:', backendConversations.length)
       } catch (error) {
-        console.error('❌ Failed to load conversations:', error)
+        console.error('❌ Backend unavailable, starting with empty state:', error)
+        setConversations([])
+        setActionRequiredIds([])
       }
     }
 
@@ -200,6 +207,20 @@ export default function AdminChatPage() {
 
   const handleCopy = (content: string) => {
     navigator.clipboard.writeText(content)
+  }
+
+  const handleShowRawEmail = async (messageId: string) => {
+    try {
+      const res = await fetch(`http://localhost:4000/api/messages/${messageId}/raw`)
+      const data = await res.json()
+      if (data.hasRawData === false) {
+        setRawEmailData({ noData: true })
+      } else {
+        setRawEmailData(data)
+      }
+    } catch {
+      setRawEmailData({ error: true })
+    }
   }
 
   const handleAttachImage = (file: File) => {
@@ -427,6 +448,7 @@ export default function AdminChatPage() {
           message={contextMenu.message}
           onClose={() => setContextMenu(null)}
           onCopy={handleCopy}
+          onShowRawEmail={handleShowRawEmail}
         />
       )}
 
@@ -447,6 +469,65 @@ export default function AdminChatPage() {
           imageUrl={viewingImage}
           onClose={() => setViewingImage(null)}
         />
+      )}
+
+      {/* Raw Email Modal */}
+      {rawEmailData && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          onClick={() => setRawEmailData(null)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+              <h3 className="font-semibold text-gray-800">Original E-Mail Daten</h3>
+              <button
+                onClick={() => setRawEmailData(null)}
+                className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="overflow-y-auto p-5 space-y-3 text-sm">
+              {rawEmailData.noData ? (
+                <p className="text-gray-500 italic">Keine E-Mail-Daten verfügbar (manuell gesendet oder WhatsApp).</p>
+              ) : rawEmailData.error ? (
+                <p className="text-red-500">Fehler beim Laden der E-Mail-Daten.</p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
+                    {[
+                      ['Platform', rawEmailData.platform],
+                      ['Von', rawEmailData.from],
+                      ['An', rawEmailData.to],
+                      ['Reply-To', rawEmailData.replyTo],
+                      ['Betreff', rawEmailData.subject],
+                      ['Hash', rawEmailData.platformHash],
+                      ['Reply Email', rawEmailData.replyToEmail],
+                      ['Property', rawEmailData.propertyName],
+                      ['Ext. Name', rawEmailData.extractedName],
+                      ['Gmail ID', rawEmailData.gmailId],
+                      ['Thread ID', rawEmailData.threadId],
+                    ].map(([label, value]) => value ? (
+                      <React.Fragment key={label}>
+                        <span className="text-gray-400 font-medium text-xs uppercase tracking-wide whitespace-nowrap pt-0.5">{label}</span>
+                        <span className="text-gray-700 break-all font-mono text-xs">{value}</span>
+                      </React.Fragment>
+                    ) : null)}
+                  </div>
+                  <div className="border-t border-gray-100 pt-3 mt-3">
+                    <p className="text-gray-400 font-medium text-xs uppercase tracking-wide mb-2">E-Mail Body</p>
+                    <pre className="bg-gray-50 rounded-lg p-3 text-xs text-gray-600 whitespace-pre-wrap break-words max-h-60 overflow-y-auto font-mono border border-gray-100">
+                      {rawEmailData.body}
+                    </pre>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
