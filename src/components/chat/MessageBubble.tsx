@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { FileText, Languages, Calendar, Users, Home, Hash, CreditCard, Loader2 } from "lucide-react"
+import { FileText, Languages, RefreshCw, Calendar, Users, Home, Hash, CreditCard, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Message } from "@/types/chat"
 
@@ -200,18 +200,31 @@ export default function MessageBubble({
         style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.12)", padding: "16px" }}
         onContextMenu={(e) => onContextMenu(e, message)}
       >
-        {/* Translation toggle or retry icon */}
+        {/* Translation icons */}
         {hasTranslation && (
-          <button
-            onClick={() => setShowAlternate(!showAlternate)}
-            className={cn(
-              "absolute top-2 right-2 p-0.5 rounded transition-opacity cursor-pointer",
-              showAlternate ? "opacity-60" : "opacity-25 hover:opacity-50"
-            )}
-            title={showAlternate ? "Übersetzung anzeigen" : "Original anzeigen"}
-          >
-            <Languages className="h-3.5 w-3.5 text-gray-500" />
-          </button>
+          <div className="absolute top-2 right-2 flex items-center gap-0.5">
+            <button
+              onClick={handleRetryTranslation}
+              disabled={translating}
+              className="p-0.5 rounded opacity-25 hover:opacity-60 transition-opacity cursor-pointer"
+              title="Neu übersetzen"
+            >
+              {translating
+                ? <Loader2 className="h-3 w-3 text-gray-500 animate-spin" />
+                : <RefreshCw className="h-3 w-3 text-gray-500" />
+              }
+            </button>
+            <button
+              onClick={() => setShowAlternate(!showAlternate)}
+              className={cn(
+                "p-0.5 rounded transition-opacity cursor-pointer",
+                showAlternate ? "opacity-60" : "opacity-25 hover:opacity-50"
+              )}
+              title={showAlternate ? "Übersetzung anzeigen" : "Original anzeigen"}
+            >
+              <Languages className="h-3.5 w-3.5 text-gray-500" />
+            </button>
+          </div>
         )}
         {needsTranslation && (
           <button
