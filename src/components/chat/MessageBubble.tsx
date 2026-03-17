@@ -1,37 +1,61 @@
 "use client"
 
 import React, { useState } from "react"
-import { FileText, Languages, Calendar, Users, Home, Hash, CreditCard } from "lucide-react"
+import { FileText, Languages, Calendar, Users, Home, Hash, CreditCard, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Message } from "@/types/chat"
+
+function hasNonLatinChars(text: string): boolean {
+  const alpha = text.match(/\p{L}/gu) || []
+  if (alpha.length === 0) return false
+  const latin = alpha.filter((ch) => /[\p{Script=Latin}]/u.test(ch))
+  return 1 - latin.length / alpha.length > 0.3
+}
 
 interface MessageBubbleProps {
   message: Message
   onContextMenu: (e: React.MouseEvent, message: Message) => void
   onImageClick?: (url: string) => void
+  onRetryTranslation?: (messageId: string) => Promise<{ content: string; originalContent: string | null }>
 }
 
 export default function MessageBubble({
   message,
   onContextMenu,
   onImageClick,
+  onRetryTranslation,
 }: MessageBubbleProps) {
   const [showAlternate, setShowAlternate] = useState(false)
-  const hasTranslation = !!message.originalContent
+  const [translating, setTranslating] = useState(false)
+  const [localContent, setLocalContent] = useState<string | null>(null)
+  const [localOriginal, setLocalOriginal] = useState<string | null | undefined>(undefined)
 
-  // If translation failed (⚠️), show real message by default and warning on toggle
-  // If translation succeeded, show translation by default and original on toggle
-  const translationFailed = message.content?.startsWith('⚠️')
-  const defaultContent = translationFailed && message.originalContent
-    ? message.originalContent
-    : message.content
-  const alternateContent = translationFailed
-    ? message.content
-    : message.originalContent
+  const content = localContent ?? message.content
+  const originalContent = localOriginal !== undefined ? localOriginal : (message.originalContent ?? null)
+
+  const hasTranslation = !!originalContent
+  const needsTranslation = !message.isOwn && !hasTranslation && hasNonLatinChars(content)
+
+  const defaultContent = content
+  const alternateContent = originalContent
 
   const displayContent = showAlternate && alternateContent
     ? alternateContent
     : defaultContent
+
+  const handleRetryTranslation = async () => {
+    if (!onRetryTranslation || translating) return
+    setTranslating(true)
+    try {
+      const result = await onRetryTranslation(message.id)
+      setLocalContent(result.content)
+      setLocalOriginal(result.originalContent)
+    } catch {
+      // leave as-is on failure
+    } finally {
+      setTranslating(false)
+    }
+  }
 
   // Parse booking info from message content
   const bookingMatch = displayContent?.match(/\[BOOKING_INFO\](.*?)\[\/BOOKING_INFO\]\n?([\s\S]*)/)
@@ -176,7 +200,7 @@ export default function MessageBubble({
         style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.12)", padding: "16px" }}
         onContextMenu={(e) => onContextMenu(e, message)}
       >
-        {/* Translation toggle icon */}
+        {/* Translation toggle or retry icon */}
         {hasTranslation && (
           <button
             onClick={() => setShowAlternate(!showAlternate)}
@@ -184,12 +208,22 @@ export default function MessageBubble({
               "absolute top-2 right-2 p-0.5 rounded transition-opacity cursor-pointer",
               showAlternate ? "opacity-60" : "opacity-25 hover:opacity-50"
             )}
-            title={showAlternate
-              ? (translationFailed ? "Original anzeigen" : "Übersetzung anzeigen")
-              : (translationFailed ? "Status anzeigen" : "Original anzeigen")
-            }
+            title={showAlternate ? "Übersetzung anzeigen" : "Original anzeigen"}
           >
             <Languages className="h-3.5 w-3.5 text-gray-500" />
+          </button>
+        )}
+        {needsTranslation && (
+          <button
+            onClick={handleRetryTranslation}
+            disabled={translating}
+            className="absolute top-2 right-2 p-0.5 rounded opacity-50 hover:opacity-80 transition-opacity cursor-pointer"
+            title="Übersetzen"
+          >
+            {translating
+              ? <Loader2 className="h-3.5 w-3.5 text-amber-600 animate-spin" />
+              : <Languages className="h-3.5 w-3.5 text-amber-600" />
+            }
           </button>
         )}
 

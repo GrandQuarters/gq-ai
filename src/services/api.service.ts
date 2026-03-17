@@ -75,6 +75,17 @@ export class ApiService {
     return data.aiSuggestion || null;
   }
 
+  async retryTranslation(messageId: string): Promise<{ content: string; originalContent: string | null }> {
+    const response = await fetch(`${API_URL}/messages/${messageId}/retry-translation`, {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: 'Translation failed' }));
+      throw new Error(err.error || `HTTP ${response.status}`);
+    }
+    return response.json();
+  }
+
   async getActionRequiredIds(): Promise<string[]> {
     const response = await fetch(`${API_URL}/action-required`);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);

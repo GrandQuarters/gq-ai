@@ -389,6 +389,7 @@ export default function AdminChatPage() {
                   message={message}
                   onContextMenu={handleContextMenu}
                   onImageClick={setViewingImage}
+                  onRetryTranslation={(msgId) => apiService.retryTranslation(msgId)}
                 />
               ))}
               <div ref={messagesEndRef} />
