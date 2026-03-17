@@ -150,6 +150,16 @@ export default function AdminChatPage() {
       }))
       console.log('✅ Loaded messages:', backendMessages.length)
       await apiService.markConversationRead(conversation.id)
+
+      // Load pending AI suggestion if available
+      const pendingSuggestion = await apiService.getPendingAiSuggestion(conversation.id)
+      if (pendingSuggestion) {
+        setCurrentAISuggestion(pendingSuggestion)
+        setIsAISuggestionVisible(true)
+      } else {
+        setCurrentAISuggestion(null)
+        setIsAISuggestionVisible(false)
+      }
     } catch (error) {
       console.error('❌ Failed to load messages:', error)
     }
@@ -161,6 +171,8 @@ export default function AdminChatPage() {
     try {
       // Send via backend API
       await apiService.sendMessage(selectedConversation.id, content)
+      setCurrentAISuggestion(null)
+      setIsAISuggestionVisible(false)
 
       // Optimistically add to UI
       const newMessage: Message = {
