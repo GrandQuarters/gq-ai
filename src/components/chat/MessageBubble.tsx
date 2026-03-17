@@ -5,13 +5,6 @@ import { FileText, Languages, RefreshCw, Calendar, Users, Home, Hash, CreditCard
 import { cn } from "@/lib/utils"
 import type { Message } from "@/types/chat"
 
-function hasNonLatinChars(text: string): boolean {
-  const alpha = text.match(/\p{L}/gu) || []
-  if (alpha.length === 0) return false
-  const latin = alpha.filter((ch) => /[\p{Script=Latin}]/u.test(ch))
-  return 1 - latin.length / alpha.length > 0.3
-}
-
 interface MessageBubbleProps {
   message: Message
   onContextMenu: (e: React.MouseEvent, message: Message) => void
@@ -25,7 +18,7 @@ export default function MessageBubble({
   onImageClick,
   onRetryTranslation,
 }: MessageBubbleProps) {
-  const [showAlternate, setShowAlternate] = useState(false)
+  const [showOriginal, setShowOriginal] = useState(false)
   const [translating, setTranslating] = useState(false)
   const [localContent, setLocalContent] = useState<string | null>(null)
   const [localOriginal, setLocalOriginal] = useState<string | null | undefined>(undefined)
@@ -34,22 +27,38 @@ export default function MessageBubble({
   const originalContent = localOriginal !== undefined ? localOriginal : (message.originalContent ?? null)
 
   const hasTranslation = !!originalContent
-  const needsTranslation = !message.isOwn && !hasTranslation && hasNonLatinChars(content)
+  const isGuestMessage = !message.isOwn
 
-  const defaultContent = content
-  const alternateContent = originalContent
+  const displayContent = showOriginal && originalContent
+    ? originalContent
+    : content
 
-  const displayContent = showAlternate && alternateContent
-    ? alternateContent
-    : defaultContent
+  const handleTranslate = async () => {
+    if (!onRetryTranslation || translating) return
+    if (hasTranslation) {
+      setShowOriginal(!showOriginal)
+      return
+    }
+    setTranslating(true)
+    try {
+      const result = await onRetryTranslation(message.id)
+      setLocalContent(result.content)
+      setLocalOriginal(result.originalContent)
+    } catch {
+      // leave as-is on failure
+    } finally {
+      setTranslating(false)
+    }
+  }
 
-  const handleRetryTranslation = async () => {
+  const handleRetranslate = async () => {
     if (!onRetryTranslation || translating) return
     setTranslating(true)
     try {
       const result = await onRetryTranslation(message.id)
       setLocalContent(result.content)
       setLocalOriginal(result.originalContent)
+      setShowOriginal(false)
     } catch {
       // leave as-is on failure
     } finally {
@@ -200,44 +209,42 @@ export default function MessageBubble({
         style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.12)", padding: "16px" }}
         onContextMenu={(e) => onContextMenu(e, message)}
       >
-        {/* Translation icons */}
-        {hasTranslation && (
+        {/* Translation icons for all guest messages */}
+        {isGuestMessage && (
           <div className="absolute top-2 right-2 flex items-center gap-0.5">
+            {hasTranslation && (
+              <button
+                onClick={handleRetranslate}
+                disabled={translating}
+                className="p-0.5 rounded opacity-25 hover:opacity-60 transition-opacity cursor-pointer"
+                title="Neu übersetzen"
+              >
+                {translating
+                  ? <Loader2 className="h-3 w-3 text-gray-500 animate-spin" />
+                  : <RefreshCw className="h-3 w-3 text-gray-500" />
+                }
+              </button>
+            )}
             <button
-              onClick={handleRetryTranslation}
-              disabled={translating}
-              className="p-0.5 rounded opacity-25 hover:opacity-60 transition-opacity cursor-pointer"
-              title="Neu übersetzen"
-            >
-              {translating
-                ? <Loader2 className="h-3 w-3 text-gray-500 animate-spin" />
-                : <RefreshCw className="h-3 w-3 text-gray-500" />
-              }
-            </button>
-            <button
-              onClick={() => setShowAlternate(!showAlternate)}
+              onClick={handleTranslate}
+              disabled={translating && !hasTranslation}
               className={cn(
                 "p-0.5 rounded transition-opacity cursor-pointer",
-                showAlternate ? "opacity-60" : "opacity-25 hover:opacity-50"
+                hasTranslation
+                  ? (showOriginal ? "opacity-60" : "opacity-25 hover:opacity-50")
+                  : "opacity-40 hover:opacity-70"
               )}
-              title={showAlternate ? "Übersetzung anzeigen" : "Original anzeigen"}
+              title={hasTranslation
+                ? (showOriginal ? "Übersetzung anzeigen" : "Original anzeigen")
+                : "Übersetzen"
+              }
             >
-              <Languages className="h-3.5 w-3.5 text-gray-500" />
+              {translating && !hasTranslation
+                ? <Loader2 className="h-3.5 w-3.5 text-gray-500 animate-spin" />
+                : <Languages className="h-3.5 w-3.5 text-gray-500" />
+              }
             </button>
           </div>
-        )}
-        {needsTranslation && (
-          <button
-            onClick={handleRetryTranslation}
-            disabled={translating}
-            className="absolute top-2 right-2 p-0.5 rounded opacity-50 hover:opacity-80 transition-opacity cursor-pointer"
-            title="Übersetzen"
-          >
-            {translating
-              ? <Loader2 className="h-3.5 w-3.5 text-amber-600 animate-spin" />
-              : <Languages className="h-3.5 w-3.5 text-amber-600" />
-            }
-          </button>
         )}
 
         <p className="text-xs font-semibold mb-1" style={{ color: "#D4A574" }}>
