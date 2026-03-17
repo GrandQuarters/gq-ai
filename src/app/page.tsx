@@ -1,6 +1,8 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase"
 import ChatSidebar from "@/components/chat/ChatSidebar"
 import ChatHeader from "@/components/chat/ChatHeader"
 import MessageBubble from "@/components/chat/MessageBubble"
@@ -14,6 +16,8 @@ import { mockConversations, mockMessages, generateId } from "@/data/mockData"
 import { apiService } from "@/services/api.service"
 
 export default function AdminChatPage() {
+  const router = useRouter()
+  const [authReady, setAuthReady] = useState(false)
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [messages, setMessages] = useState<Record<string, Message[]>>({})
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
@@ -35,11 +39,30 @@ export default function AdminChatPage() {
   }
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        router.replace("/login")
+      } else {
+        setAuthReady(true)
+      }
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        router.replace("/login")
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [router])
+
+  useEffect(() => {
     scrollToBottom()
   }, [selectedConversation, messages])
 
   // Load conversations from backend on mount
   useEffect(() => {
+    if (!authReady) return
     async function loadConversations() {
       try {
         const backendConversations = await apiService.getConversations()
@@ -131,7 +154,7 @@ export default function AdminChatPage() {
     return () => {
       apiService.disconnectWebSocket()
     }
-  }, [])
+  }, [authReady])
 
   const handleSelectConversation = async (conversation: Conversation) => {
     setSelectedConversation(conversation)
@@ -327,9 +350,22 @@ export default function AdminChatPage() {
     }
   }
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.replace("/login")
+  }
+
   const currentMessages = selectedConversation
     ? messages[selectedConversation.id] || []
     : []
+
+  if (!authReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-700" />
+      </div>
+    )
+  }
 
   return (
     <div className="h-screen flex bg-gray-50/30 relative">
@@ -365,6 +401,7 @@ export default function AdminChatPage() {
               conversation={selectedConversation}
               onInfoClick={() => setShowApartmentDetails(!showApartmentDetails)}
               onBackClick={() => setShowMobileChat(false)}
+              onLogout={handleLogout}
               onGenerateAI={async () => {
                 try {
                   const suggestion = await apiService.generateAiResponse(selectedConversation.id)

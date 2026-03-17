@@ -1,13 +1,14 @@
 "use client"
 
 import React, { useState } from "react"
-import { Phone, Video, Info, ArrowLeft, Sparkles } from "lucide-react"
+import { Phone, Video, Info, ArrowLeft, Sparkles, LogOut } from "lucide-react"
 import type { Conversation } from "@/types/chat"
 
 interface ChatHeaderProps {
   conversation: Conversation
   onInfoClick: () => void
   onBackClick?: () => void
+  onLogout?: () => void
   onGenerateAI?: () => Promise<void>
 }
 
@@ -15,6 +16,7 @@ export default function ChatHeader({
   conversation,
   onInfoClick,
   onBackClick,
+  onLogout,
   onGenerateAI,
 }: ChatHeaderProps) {
   const [generating, setGenerating] = useState(false)
@@ -117,6 +119,17 @@ export default function ChatHeader({
         >
           <Info className="h-5 w-5 text-gray-600" />
         </button>
+
+        {/* Logout */}
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            title="Abmelden"
+          >
+            <LogOut className="h-5 w-5 text-gray-600" />
+          </button>
+        )}
       </div>
     </div>
   )
