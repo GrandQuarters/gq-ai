@@ -141,7 +141,7 @@ export default function AdminChatPage() {
     setEditingMessage(null)
     setShowMobileChat(true)
 
-    // Load messages from backend
+    // Load messages from backend and mark as read
     try {
       const backendMessages = await apiService.getMessages(conversation.id)
       setMessages((prev) => ({
@@ -149,6 +149,7 @@ export default function AdminChatPage() {
         [conversation.id]: backendMessages as Message[],
       }))
       console.log('✅ Loaded messages:', backendMessages.length)
+      await apiService.markConversationRead(conversation.id)
     } catch (error) {
       console.error('❌ Failed to load messages:', error)
     }

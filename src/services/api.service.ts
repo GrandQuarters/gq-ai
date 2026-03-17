@@ -62,6 +62,10 @@ export class ApiService {
     return response.json();
   }
 
+  async markConversationRead(conversationId: string): Promise<void> {
+    await fetch(`${API_URL}/conversations/${conversationId}/read`, { method: 'POST' });
+  }
+
   async generateAiResponse(conversationId: string): Promise<string | null> {
     const response = await fetch(`${API_URL}/conversations/${conversationId}/generate-ai`, {
       method: 'POST',
