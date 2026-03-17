@@ -368,16 +368,7 @@ export default function AdminChatPage() {
   }
 
   return (
-    <div className="h-screen flex bg-gray-50/30 relative">
-      {/* Static Dot Pattern Background */}
-      <div 
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          backgroundImage: 'radial-gradient(circle, #9ca3af 1px, transparent 1px)',
-          backgroundSize: '20px 20px',
-          opacity: 0.25,
-        }}
-      />
+    <div className="h-screen flex bg-white relative">
 
       {/* Sidebar - Hidden on mobile when chat is open */}
       <div className={`${showMobileChat ? 'hidden md:block' : 'block'} w-full md:w-80`}>

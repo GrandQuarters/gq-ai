@@ -85,7 +85,7 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 className="w-full px-3 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
-                placeholder="admin@grandquarters.at"
+                placeholder="E-Mail"
               />
             </div>
 
@@ -101,7 +101,7 @@ export default function LoginPage() {
                 required
                 autoComplete="current-password"
                 className="w-full px-3 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
-                placeholder="••••••••"
+                placeholder="Passwort"
               />
             </div>
 
