@@ -421,7 +421,7 @@ export default function AdminChatPage() {
             {/* Messages */}
             <div 
               className="flex-1 overflow-y-auto p-4 no-scrollbar"
-              style={{ paddingBottom: isAISuggestionVisible ? "140px" : "96px" }}
+              style={{ paddingBottom: isAISuggestionVisible ? "320px" : "120px" }}
             >
               {currentMessages.map((message) => (
                 <MessageBubble

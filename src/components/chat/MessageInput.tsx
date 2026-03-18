@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { Send, Paperclip, Smile, Image, FileText, X } from "lucide-react"
 import AISuggestion from "./AISuggestion"
 import ActionRequiredAlert from "./ActionRequiredAlert"
@@ -45,6 +45,18 @@ export default function MessageInput({
   const [showAISuggestion, setShowAISuggestion] = useState(true)
   const [showActionRequired, setShowActionRequired] = useState(true)
   const imageInputRef = useRef<HTMLInputElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const MAX_TEXTAREA_HEIGHT = 240
+
+  useEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    const newHeight = Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT)
+    el.style.height = newHeight + 'px'
+    el.style.overflowY = el.scrollHeight > MAX_TEXTAREA_HEIGHT ? 'auto' : 'hidden'
+  }, [message])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -129,23 +141,27 @@ export default function MessageInput({
       )}
 
       <form onSubmit={handleSubmit} className="relative">
-        <input
-          type="text"
+        <textarea
+          ref={textareaRef}
+          rows={1}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full pl-12 pr-24 py-3 rounded-full outline-none text-gray-900 placeholder:text-gray-500 placeholder:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full pl-12 pr-24 py-3 rounded-2xl outline-none text-gray-900 placeholder:text-gray-500 placeholder:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
             boxShadow: "0 3px 8px rgba(0,0,0,0.18)",
             background: "linear-gradient(to right, rgba(250,250,250,0.95), rgba(240,240,240,0.95))",
             opacity: 0.85,
+            resize: "none",
+            overflowY: "hidden",
+            lineHeight: "1.5",
           }}
         />
 
         {/* Attachment Button */}
-        <div className="absolute left-4 top-1/2 -translate-y-1/2">
+        <div className="absolute left-4 bottom-3">
           <button
             type="button"
             onClick={() => imageInputRef.current?.click()}
@@ -156,7 +172,7 @@ export default function MessageInput({
         </div>
 
         {/* Right Side Actions */}
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-2">
+        <div className="absolute right-2 bottom-2 flex items-center space-x-2">
           {/* Emoji Button */}
           <div className="relative">
             <button
