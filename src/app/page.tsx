@@ -86,6 +86,18 @@ export default function AdminChatPage() {
 
     loadConversations()
 
+    // Poll conversations every 15 seconds for silent background refresh
+    const pollInterval = setInterval(async () => {
+      try {
+        const backendConversations = await apiService.getConversations()
+        if (Array.isArray(backendConversations)) {
+          setConversations(backendConversations as Conversation[])
+        }
+      } catch {
+        // silently ignore poll errors
+      }
+    }, 15000)
+
     // Set up WebSocket for real-time updates
     const ws = apiService.connectWebSocket((data) => {
       if (data.type === 'new_message') {
@@ -154,6 +166,7 @@ export default function AdminChatPage() {
     })
 
     return () => {
+      clearInterval(pollInterval)
       apiService.disconnectWebSocket()
     }
   }, [authReady])
