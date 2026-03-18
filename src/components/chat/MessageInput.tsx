@@ -162,7 +162,7 @@ export default function MessageInput({
         />
 
         {/* Attachment Button */}
-        <div className="absolute left-4 bottom-2.5">
+        <div className="absolute left-4 bottom-3">
           <button
             type="button"
             onClick={() => imageInputRef.current?.click()}
@@ -173,7 +173,7 @@ export default function MessageInput({
         </div>
 
         {/* Right Side Actions */}
-        <div className="absolute right-2 bottom-2.5 flex items-center space-x-2">
+        <div className="absolute right-2 bottom-1.5 flex items-center space-x-2">
           {/* Emoji Button */}
           <div className="relative">
             <button
