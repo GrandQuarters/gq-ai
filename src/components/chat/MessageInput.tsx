@@ -149,7 +149,7 @@ export default function MessageInput({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full pl-12 pr-24 py-3 rounded-2xl outline-none text-gray-900 placeholder:text-gray-500 placeholder:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full pl-12 pr-24 py-3 rounded-2xl outline-none text-gray-900 placeholder:text-gray-500 placeholder:text-sm disabled:opacity-50 disabled:cursor-not-allowed no-scrollbar"
           style={{
             boxShadow: "0 3px 8px rgba(0,0,0,0.18)",
             background: "linear-gradient(to right, rgba(250,250,250,0.95), rgba(240,240,240,0.95))",
@@ -157,11 +157,12 @@ export default function MessageInput({
             resize: "none",
             overflowY: "hidden",
             lineHeight: "1.5",
+            scrollbarWidth: "none",
           }}
         />
 
         {/* Attachment Button */}
-        <div className="absolute left-4 bottom-3">
+        <div className="absolute left-4 bottom-2.5">
           <button
             type="button"
             onClick={() => imageInputRef.current?.click()}
@@ -172,7 +173,7 @@ export default function MessageInput({
         </div>
 
         {/* Right Side Actions */}
-        <div className="absolute right-2 bottom-2 flex items-center space-x-2">
+        <div className="absolute right-2 bottom-2.5 flex items-center space-x-2">
           {/* Emoji Button */}
           <div className="relative">
             <button
