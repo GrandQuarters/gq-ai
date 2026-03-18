@@ -152,8 +152,8 @@ export default function MessageInput({
           className="w-full pl-12 pr-24 py-3 rounded-2xl outline-none text-gray-900 placeholder:text-gray-500 placeholder:text-sm disabled:opacity-50 disabled:cursor-not-allowed no-scrollbar"
           style={{
             boxShadow: "0 3px 8px rgba(0,0,0,0.18)",
-            background: "linear-gradient(to right, rgba(250,250,250,0.95), rgba(240,240,240,0.95))",
-            opacity: 0.85,
+            background: "#ffffff",
+            opacity: 1,
             resize: "none",
             overflowY: "hidden",
             lineHeight: "1.5",
