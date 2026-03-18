@@ -28,6 +28,7 @@ export default function AdminChatPage() {
   const [isAISuggestionVisible, setIsAISuggestionVisible] = useState(true)
   const [showApartmentDetails, setShowApartmentDetails] = useState(false)
   const [actionRequiredIds, setActionRequiredIds] = useState<string[]>([])
+  const [pendingAiIds, setPendingAiIds] = useState<string[]>([])
   const [showMobileChat, setShowMobileChat] = useState(false)
   const [currentAISuggestion, setCurrentAISuggestion] = useState<string | null>(null)
   const [rawEmailData, setRawEmailData] = useState<Record<string, any> | null>(null)
@@ -139,6 +140,7 @@ export default function AdminChatPage() {
         if (data.aiSuggestion) {
           setCurrentAISuggestion(data.aiSuggestion)
           setIsAISuggestionVisible(true)
+          setPendingAiIds((prev) => [...new Set([...prev, data.conversation.id])])
         }
 
         // Update action required
@@ -179,6 +181,7 @@ export default function AdminChatPage() {
       if (pendingSuggestion) {
         setCurrentAISuggestion(pendingSuggestion)
         setIsAISuggestionVisible(true)
+        setPendingAiIds((prev) => [...new Set([...prev, conversation.id])])
       } else {
         setCurrentAISuggestion(null)
         setIsAISuggestionVisible(false)
@@ -196,6 +199,7 @@ export default function AdminChatPage() {
       await apiService.sendMessage(selectedConversation.id, content)
       setCurrentAISuggestion(null)
       setIsAISuggestionVisible(false)
+      setPendingAiIds((prev) => prev.filter((id) => id !== selectedConversation.id))
 
       // Optimistically add to UI
       const newMessage: Message = {
@@ -381,6 +385,7 @@ export default function AdminChatPage() {
           onClearChat={handleClearChat}
           onNewChat={() => {}}
           actionRequiredIds={actionRequiredIds}
+          pendingAiIds={pendingAiIds}
         />
       </div>
 

@@ -14,6 +14,7 @@ interface ChatSidebarProps {
   onClearChat: (id: string) => void
   onNewChat: () => void
   actionRequiredIds?: string[]
+  pendingAiIds?: string[]
 }
 
 export default function ChatSidebar({
@@ -25,6 +26,7 @@ export default function ChatSidebar({
   onClearChat,
   onNewChat,
   actionRequiredIds = [],
+  pendingAiIds = [],
 }: ChatSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [contextMenu, setContextMenu] = useState<{ position: ContextMenuPosition; conversationId: string } | null>(null)
@@ -60,6 +62,7 @@ export default function ChatSidebar({
 
   const renderConversationItem = (conversation: Conversation) => {
     const needsAction = actionRequiredIds.includes(conversation.id)
+    const hasPendingAi = pendingAiIds.includes(conversation.id)
     
     return (
     <div
@@ -138,14 +141,21 @@ export default function ChatSidebar({
           <p className="text-sm text-gray-600 truncate flex-1">
             {conversation.lastMessage && truncateText(conversation.lastMessage, 30)}
           </p>
-          {conversation.unreadCount > 0 && (
-            <span
-              className="text-white text-xs rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center ml-2"
-              style={{ background: "linear-gradient(135deg, #D4A574, #8B6635)" }}
-            >
-              {conversation.unreadCount}
-            </span>
-          )}
+          <div className="flex items-center gap-1 ml-2">
+            {hasPendingAi && (
+              <span className="text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold bg-red-500">
+                !
+              </span>
+            )}
+            {conversation.unreadCount > 0 && (
+              <span
+                className="text-white text-xs rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center"
+                style={{ background: "linear-gradient(135deg, #D4A574, #8B6635)" }}
+              >
+                {conversation.unreadCount}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>
