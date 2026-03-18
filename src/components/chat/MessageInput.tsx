@@ -35,7 +35,7 @@ export default function MessageInput({
   onSend,
   onAttachImage,
   disabled = false,
-  placeholder = "Nachricht eingeben...",
+  placeholder = "Nachricht eingeben... (Shift+Enter für neue Zeile)",
   aiSuggestion = null,
   actionRequired = null,
   onAISuggestionVisibilityChange,
@@ -87,6 +87,7 @@ export default function MessageInput({
       e.preventDefault()
       handleSubmit(e)
     }
+    // Shift+Enter: do nothing, browser inserts newline naturally
   }
 
   const insertEmoji = (emoji: string) => {
