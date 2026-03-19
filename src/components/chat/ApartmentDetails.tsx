@@ -183,36 +183,38 @@ export default function ApartmentDetails({
           <div className="flex items-start gap-2">
             <Calendar className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-xs text-gray-500 mb-1">Aufenthalt</p>
-              <div className="flex items-center justify-between text-sm">
-                <div className="text-gray-700">
+              <p className="text-xs text-gray-500 mb-2">Aufenthalt</p>
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-3 text-sm">
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 mb-0.5">Check-in</p>
                   {checkIn ? (
                     <>
-                      <span>{formatDate(checkIn)}</span>
+                      <p className="font-medium text-gray-800">{formatDate(checkIn)}</p>
                       {formatTime(checkIn) && (
-                        <span className="text-xs text-gray-400 ml-1">{formatTime(checkIn)}</span>
+                        <p className="text-xs text-gray-400 mt-0.5">{formatTime(checkIn)}</p>
                       )}
                     </>
                   ) : (
-                    <span className="text-gray-300">—</span>
+                    <p className="text-gray-300">—</p>
                   )}
                 </div>
-                <span className="text-gray-400 mx-1">→</span>
-                <div className="text-gray-700">
+                <span className="text-gray-300 text-lg">→</span>
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 mb-0.5">Check-out</p>
                   {checkOut ? (
                     <>
-                      <span>{formatDate(checkOut)}</span>
+                      <p className="font-medium text-gray-800">{formatDate(checkOut)}</p>
                       {formatTime(checkOut) && (
-                        <span className="text-xs text-gray-400 ml-1">{formatTime(checkOut)}</span>
+                        <p className="text-xs text-gray-400 mt-0.5">{formatTime(checkOut)}</p>
                       )}
                     </>
                   ) : (
-                    <span className="text-gray-300">—</span>
+                    <p className="text-gray-300">—</p>
                   )}
                 </div>
               </div>
               {nights !== null && (
-                <p className="text-xs text-gray-400 mt-0.5">{nights} {nights === 1 ? 'Nacht' : 'Nächte'}</p>
+                <p className="text-xs text-gray-400 mt-2 text-center">{nights} {nights === 1 ? 'Nacht' : 'Nächte'}</p>
               )}
             </div>
           </div>
@@ -222,12 +224,12 @@ export default function ApartmentDetails({
 
         {/* Progress Bar */}
         {progress !== null && (
-          <div>
-            <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+          <div className="ml-6">
+            <div className="flex items-center justify-between text-xs text-gray-400 mb-1.5">
               <span>Fortschritt</span>
               <span>{Math.round(progress)}%</span>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
