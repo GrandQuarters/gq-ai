@@ -403,7 +403,7 @@ export default function AdminChatPage() {
       </div>
 
       {/* Main Chat Area - Full screen on mobile when open */}
-      <div className={`${showMobileChat ? 'block' : 'hidden md:flex'} flex-1 flex flex-col relative`}>
+      <div className={`${showMobileChat ? 'flex flex-col h-dvh overflow-hidden relative' : 'hidden md:flex md:flex-col md:flex-1 md:relative'}`}>
         {selectedConversation ? (
           <>
             <ChatHeader
