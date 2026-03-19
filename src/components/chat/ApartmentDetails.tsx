@@ -1,56 +1,157 @@
 "use client"
 
 import React from "react"
-import { X, MapPin, Calendar, Euro } from "lucide-react"
+import { X, MapPin, Calendar, Euro, Users, Home, Hash, User } from "lucide-react"
+
+export interface BookingData {
+  guest?: string
+  property?: string
+  dates?: string
+  guests?: string
+  reservation?: string
+  rooms?: string
+  source?: string
+  payment?: string
+}
 
 interface ApartmentDetailsProps {
-  apartmentName: string
-  address: string
-  checkIn: Date
-  checkOut: Date
-  pricePerNight: number
+  bookingData: BookingData
+  conversationName?: string
   onClose: () => void
 }
 
+function parseBookingDates(datesStr: string): { checkIn: Date | null; checkOut: Date | null } {
+  const germanMonths: Record<string, number> = {
+    'januar': 0, 'jänner': 0, 'februar': 1, 'märz': 2, 'april': 3,
+    'mai': 4, 'juni': 5, 'juli': 6, 'august': 7, 'september': 8,
+    'oktober': 9, 'november': 10, 'dezember': 11,
+    'jan': 0, 'feb': 1, 'mär': 2, 'apr': 3,
+    'jun': 5, 'jul': 6, 'aug': 7, 'sep': 8, 'okt': 9, 'nov': 10, 'dez': 11,
+  }
+
+  const englishMonths: Record<string, number> = {
+    'january': 0, 'february': 1, 'march': 2, 'april': 3,
+    'may': 4, 'june': 5, 'july': 6, 'august': 7, 'september': 8,
+    'october': 9, 'november': 10, 'december': 11,
+    'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3,
+    'jun': 5, 'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11,
+  }
+
+  const allMonths = { ...germanMonths, ...englishMonths }
+
+  function parseSingleDate(str: string): Date | null {
+    const cleaned = str.trim().replace(/,/g, '')
+
+    // "26. März 2026" or "26. März 2026 15:00"
+    const deMatch = cleaned.match(/(\d{1,2})\.?\s+([A-Za-zÄÖÜäöüß]+)\.?\s+(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/)
+    if (deMatch) {
+      const day = parseInt(deMatch[1])
+      const monthStr = deMatch[2].toLowerCase().replace(/\.$/, '')
+      const year = parseInt(deMatch[3])
+      const hours = deMatch[4] ? parseInt(deMatch[4]) : 0
+      const minutes = deMatch[5] ? parseInt(deMatch[5]) : 0
+      const month = allMonths[monthStr]
+      if (month !== undefined) {
+        return new Date(year, month, day, hours, minutes)
+      }
+    }
+
+    // "2026-03-26" ISO format
+    const isoMatch = cleaned.match(/(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{1,2}):(\d{2}))?/)
+    if (isoMatch) {
+      return new Date(
+        parseInt(isoMatch[1]), parseInt(isoMatch[2]) - 1, parseInt(isoMatch[3]),
+        isoMatch[4] ? parseInt(isoMatch[4]) : 0,
+        isoMatch[5] ? parseInt(isoMatch[5]) : 0
+      )
+    }
+
+    // "26.03.2026" dot format
+    const dotMatch = cleaned.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/)
+    if (dotMatch) {
+      return new Date(
+        parseInt(dotMatch[3]), parseInt(dotMatch[2]) - 1, parseInt(dotMatch[1]),
+        dotMatch[4] ? parseInt(dotMatch[4]) : 0,
+        dotMatch[5] ? parseInt(dotMatch[5]) : 0
+      )
+    }
+
+    // "March 26, 2026" English format
+    const enMatch = cleaned.match(/([A-Za-z]+)\s+(\d{1,2})\s+(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/)
+    if (enMatch) {
+      const month = allMonths[enMatch[1].toLowerCase()]
+      if (month !== undefined) {
+        return new Date(
+          parseInt(enMatch[3]), month, parseInt(enMatch[2]),
+          enMatch[4] ? parseInt(enMatch[4]) : 0,
+          enMatch[5] ? parseInt(enMatch[5]) : 0
+        )
+      }
+    }
+
+    return null
+  }
+
+  // Split by "–" or "-" (em-dash or regular dash with spaces)
+  const parts = datesStr.split(/\s*[–—-]\s*/)
+  const checkIn = parts[0] ? parseSingleDate(parts[0]) : null
+  const checkOut = parts[1] ? parseSingleDate(parts[1]) : null
+
+  return { checkIn, checkOut }
+}
+
 export default function ApartmentDetails({
-  apartmentName,
-  address,
-  checkIn,
-  checkOut,
-  pricePerNight,
+  bookingData,
+  conversationName,
   onClose,
 }: ApartmentDetailsProps) {
+  const { checkIn, checkOut } = bookingData.dates
+    ? parseBookingDates(bookingData.dates)
+    : { checkIn: null, checkOut: null }
+
+  const hasData = Object.values(bookingData).some(v => v !== undefined && v !== '')
+
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString("de-DE", { day: "2-digit", month: "short", year: "numeric" })
+    return date.toLocaleDateString("de-DE", { day: "2-digit", month: "long", year: "numeric" })
+  }
+
+  const formatTime = (date: Date) => {
+    const h = date.getHours()
+    const m = date.getMinutes()
+    if (h === 0 && m === 0) return null
+    return date.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
   }
 
   const calculateProgress = () => {
+    if (!checkIn || !checkOut) return null
     const now = new Date()
     const total = checkOut.getTime() - checkIn.getTime()
+    if (total <= 0) return null
     const elapsed = now.getTime() - checkIn.getTime()
     return Math.min(Math.max((elapsed / total) * 100, 0), 100)
   }
 
   const calculateNights = () => {
-    const diffTime = Math.abs(checkOut.getTime() - checkIn.getTime())
+    if (!checkIn || !checkOut) return null
+    const diffTime = checkOut.getTime() - checkIn.getTime()
+    if (diffTime <= 0) return null
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   }
 
   const progress = calculateProgress()
   const nights = calculateNights()
-  const totalPrice = nights * pricePerNight
+  const guestName = bookingData.guest || conversationName || null
 
   return (
-    <div 
+    <div
       className="absolute top-16 right-4 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-slide-up"
       style={{
         backgroundColor: "rgba(255, 255, 255, 0.98)",
         backdropFilter: "blur(10px)",
       }}
     >
-      {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <h3 className="font-semibold text-gray-900">Apartment Details</h3>
+        <h3 className="font-semibold text-gray-900">Buchungsdetails</h3>
         <button
           onClick={onClose}
           className="p-1 hover:bg-gray-100 rounded-full transition-colors"
@@ -59,82 +160,116 @@ export default function ApartmentDetails({
         </button>
       </div>
 
-      {/* Content */}
       <div className="p-5 space-y-4">
-        {/* Apartment Name */}
-        <div>
-          <p className="text-xs text-gray-500 mb-1">Apartment</p>
-          <p className="font-semibold text-gray-900">{apartmentName}</p>
-        </div>
+        {!hasData && (
+          <p className="text-sm text-gray-400 italic text-center py-4">
+            Keine Buchungsdaten verfügbar
+          </p>
+        )}
 
-        {/* Address */}
-        <div className="flex items-start gap-2">
-          <MapPin className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="text-xs text-gray-500 mb-0.5">Adresse</p>
-            <p className="text-sm text-gray-700">{address}</p>
-          </div>
-        </div>
+        {/* Guest */}
+        <DetailRow icon={<User className="h-4 w-4" />} label="Gast" value={guestName} />
+
+        {/* Property */}
+        <DetailRow icon={<Home className="h-4 w-4" />} label="Objekt" value={bookingData.property} />
+
+        {/* Reservation */}
+        {bookingData.reservation && (
+          <DetailRow icon={<Hash className="h-4 w-4" />} label="Buchungsnr." value={bookingData.reservation} />
+        )}
 
         {/* Stay Duration */}
-        <div className="flex items-start gap-2">
-          <Calendar className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-xs text-gray-500 mb-1">Aufenthalt</p>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-700">{formatDate(checkIn)}</span>
-              <span className="text-gray-400">→</span>
-              <span className="text-gray-700">{formatDate(checkOut)}</span>
+        {(checkIn || checkOut) ? (
+          <div className="flex items-start gap-2">
+            <Calendar className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-xs text-gray-500 mb-1">Aufenthalt</p>
+              <div className="flex items-center justify-between text-sm">
+                <div className="text-gray-700">
+                  {checkIn ? (
+                    <>
+                      <span>{formatDate(checkIn)}</span>
+                      {formatTime(checkIn) && (
+                        <span className="text-xs text-gray-400 ml-1">{formatTime(checkIn)}</span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-gray-300">—</span>
+                  )}
+                </div>
+                <span className="text-gray-400 mx-1">→</span>
+                <div className="text-gray-700">
+                  {checkOut ? (
+                    <>
+                      <span>{formatDate(checkOut)}</span>
+                      {formatTime(checkOut) && (
+                        <span className="text-xs text-gray-400 ml-1">{formatTime(checkOut)}</span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-gray-300">—</span>
+                  )}
+                </div>
+              </div>
+              {nights !== null && (
+                <p className="text-xs text-gray-400 mt-0.5">{nights} {nights === 1 ? 'Nacht' : 'Nächte'}</p>
+              )}
             </div>
           </div>
-        </div>
+        ) : (
+          <DetailRow icon={<Calendar className="h-4 w-4" />} label="Aufenthalt" value={bookingData.dates || null} />
+        )}
 
         {/* Progress Bar */}
-        <div>
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-            <span>Fortschritt</span>
-            <span>{Math.round(progress)}%</span>
-          </div>
-          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${progress}%`,
-                background: "linear-gradient(135deg, #D4A574, #8B6635)",
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Pricing */}
-        <div className="pt-3 border-t border-gray-100 space-y-2">
-          <div className="flex items-center gap-2">
-            <Euro className="h-4 w-4 text-gray-400 flex-shrink-0" />
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">Pro Nacht</span>
-                <span className="text-sm font-medium text-gray-700">€{pricePerNight}</span>
-              </div>
+        {progress !== null && (
+          <div>
+            <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+              <span>Fortschritt</span>
+              <span>{Math.round(progress)}%</span>
+            </div>
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${progress}%`,
+                  background: "linear-gradient(135deg, #D4A574, #8B6635)",
+                }}
+              />
             </div>
           </div>
-          <div className="flex items-center justify-between pt-2">
-            <span className="text-sm font-medium text-gray-900">Gesamtpreis ({nights} Nächte)</span>
-            <span 
-              className="text-lg font-bold"
-              style={{ 
-                background: "linear-gradient(135deg, #D4A574, #8B6635)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              €{totalPrice}
-            </span>
-          </div>
-        </div>
+        )}
+
+        {/* Guests */}
+        {bookingData.guests && (
+          <DetailRow icon={<Users className="h-4 w-4" />} label="Gäste" value={bookingData.guests} />
+        )}
+
+        {/* Rooms */}
+        {bookingData.rooms && (
+          <DetailRow icon={<Home className="h-4 w-4" />} label="Zimmer" value={bookingData.rooms} />
+        )}
+
+        {/* Source */}
+        {bookingData.source && (
+          <DetailRow icon={<MapPin className="h-4 w-4" />} label="Plattform" value={bookingData.source} />
+        )}
       </div>
     </div>
   )
 }
 
-
-
+function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | null | undefined }) {
+  return (
+    <div className="flex items-start gap-2">
+      <span className="text-gray-400 mt-0.5 flex-shrink-0">{icon}</span>
+      <div>
+        <p className="text-xs text-gray-500 mb-0.5">{label}</p>
+        {value ? (
+          <p className="text-sm text-gray-700">{value}</p>
+        ) : (
+          <p className="text-sm text-gray-300 italic">—</p>
+        )}
+      </div>
+    </div>
+  )
+}

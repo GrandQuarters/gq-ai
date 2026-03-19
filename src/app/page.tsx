@@ -10,7 +10,7 @@ import MessageInput from "@/components/chat/MessageInput"
 import MessageContextMenu from "@/components/chat/MessageContextMenu"
 import ToastNotification from "@/components/chat/ToastNotification"
 import ImageViewer from "@/components/chat/ImageViewer"
-import ApartmentDetails from "@/components/chat/ApartmentDetails"
+import ApartmentDetails, { type BookingData } from "@/components/chat/ApartmentDetails"
 import type { Conversation, Message, ContextMenuPosition, ToastNotification as ToastType } from "@/types/chat"
 import { mockConversations, mockMessages, generateId } from "@/data/mockData"
 import { apiService } from "@/services/api.service"
@@ -443,16 +443,30 @@ export default function AdminChatPage() {
             />
 
             {/* Apartment Details Dropdown */}
-            {showApartmentDetails && (
-              <ApartmentDetails
-                apartmentName="Grand Quarters Deluxe"
-                address="Radetzkystraße 14/22, 1030 Wien"
-                checkIn={new Date(Date.now() - 1000 * 60 * 60 * 24 * 3)}
-                checkOut={new Date(Date.now() + 1000 * 60 * 60 * 24 * 4)}
-                pricePerNight={160}
-                onClose={() => setShowApartmentDetails(false)}
-              />
-            )}
+            {showApartmentDetails && (() => {
+              const convMessages = messages[selectedConversation.id] || []
+              const bookingData: BookingData = {}
+              for (const msg of convMessages) {
+                const match = msg.content?.match(/\[BOOKING_INFO\](.*?)\[\/BOOKING_INFO\]/)
+                if (match) {
+                  try {
+                    const parsed = JSON.parse(match[1]) as Record<string, string>
+                    Object.entries(parsed).forEach(([k, v]) => {
+                      if (v && !(bookingData as any)[k]) {
+                        (bookingData as any)[k] = v
+                      }
+                    })
+                  } catch { /* skip malformed */ }
+                }
+              }
+              return (
+                <ApartmentDetails
+                  bookingData={bookingData}
+                  conversationName={selectedConversation.name}
+                  onClose={() => setShowApartmentDetails(false)}
+                />
+              )
+            })()}
 
             {/* Messages */}
             <div 
