@@ -98,16 +98,13 @@ export default function ChatHeader({
           <button
             onClick={handleGenerateAI}
             disabled={generating}
-            className="px-3 py-1.5 text-xs font-medium rounded-full transition-colors flex items-center gap-1.5"
+            className="p-2 rounded-full transition-colors flex items-center justify-center"
             style={{
-              background: generating ? '#e5e7eb' : 'linear-gradient(135deg, #D4A574, #8B6635)',
-              color: generating ? '#9ca3af' : '#fff',
               cursor: generating ? 'not-allowed' : 'pointer',
             }}
             title="KI-Antwort generieren"
           >
-            <Sparkles className="h-3.5 w-3.5" />
-            {generating ? 'Generiert...' : 'KI Antwort'}
+            <Sparkles className={`h-5 w-5 ${generating ? 'text-gray-400 animate-spin' : 'text-gray-600 hover:text-amber-700'}`} />
           </button>
         )}
 
