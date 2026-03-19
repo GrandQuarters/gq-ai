@@ -385,7 +385,7 @@ export default function AdminChatPage() {
   }
 
   return (
-    <div className="h-screen flex bg-white relative">
+    <div className="h-dvh flex bg-white relative overflow-hidden">
 
       {/* Sidebar - Hidden on mobile when chat is open */}
       <div className={`${showMobileChat ? 'hidden md:block' : 'block'} w-full md:w-80`}>
@@ -403,7 +403,7 @@ export default function AdminChatPage() {
       </div>
 
       {/* Main Chat Area - Full screen on mobile when open */}
-      <div className={`${showMobileChat ? 'flex flex-col h-dvh overflow-hidden relative' : 'hidden md:flex md:flex-col md:flex-1 md:relative'}`}>
+      <div className={`${showMobileChat ? 'block' : 'hidden md:flex'} flex-1 flex flex-col relative`}>
         {selectedConversation ? (
           <>
             <ChatHeader

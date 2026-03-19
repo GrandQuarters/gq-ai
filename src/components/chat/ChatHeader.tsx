@@ -33,7 +33,7 @@ export default function ChatHeader({
   const participantText = conversation.online ? "Online" : "Offline"
 
   return (
-    <div className="h-16 px-4 flex items-center justify-between border-b border-gray-200 bg-white sticky top-0 z-10 md:relative md:top-auto">
+    <div className="h-16 px-4 flex items-center justify-between border-b border-gray-200 bg-white flex-shrink-0">
       <div className="flex items-center gap-3">
         {/* Back Button - Only visible on mobile */}
         {onBackClick && (
