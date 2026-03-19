@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { FileText, Languages, RefreshCw, Calendar, Users, Home, Hash, CreditCard, Loader2 } from "lucide-react"
+import { FileText, Languages, RefreshCw, Calendar, Users, Home, Hash, CreditCard, Loader2, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Message } from "@/types/chat"
 
@@ -74,6 +74,7 @@ export default function MessageBubble({
   const messageText = bookingMatch ? bookingMatch[2]?.trim() : displayContent
 
   const bookingFieldLabels: Record<string, { label: string; icon: React.ReactNode }> = {
+    guest: { label: 'Gast', icon: <User className="h-3 w-3" /> },
     property: { label: 'Objekt', icon: <Home className="h-3 w-3" /> },
     unit: { label: 'Einheit', icon: <Hash className="h-3 w-3" /> },
     reservation: { label: 'Reservierung', icon: <Hash className="h-3 w-3" /> },
