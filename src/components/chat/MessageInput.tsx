@@ -50,6 +50,13 @@ export default function MessageInput({
   const MAX_TEXTAREA_HEIGHT = 240
 
   useEffect(() => {
+    if (aiSuggestion) {
+      setShowAISuggestion(true)
+      onAISuggestionVisibilityChange?.(true)
+    }
+  }, [aiSuggestion])
+
+  useEffect(() => {
     const el = textareaRef.current
     if (!el) return
     el.style.height = 'auto'
