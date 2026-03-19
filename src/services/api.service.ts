@@ -86,6 +86,17 @@ export class ApiService {
     return response.json();
   }
 
+  async reparseMessage(messageId: string): Promise<{ content: string; originalContent: string | null }> {
+    const response = await fetch(`${API_URL}/messages/${messageId}/reparse`, {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: 'Reparse failed' }));
+      throw new Error(err.error || `HTTP ${response.status}`);
+    }
+    return response.json();
+  }
+
   async getPendingAiSuggestion(conversationId: string): Promise<string | null> {
     const response = await fetch(`${API_URL}/conversations/${conversationId}/pending-ai`);
     if (!response.ok) return null;

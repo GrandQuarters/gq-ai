@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Copy, Mail } from "lucide-react"
+import { Copy, Mail, RotateCcw } from "lucide-react"
 import type { ContextMenuPosition, Message } from "@/types/chat"
 
 interface MessageContextMenuProps {
@@ -10,6 +10,7 @@ interface MessageContextMenuProps {
   onClose: () => void
   onCopy: (content: string) => void
   onShowRawEmail?: (messageId: string) => void
+  onReparse?: (messageId: string) => void
 }
 
 export default function MessageContextMenu({
@@ -18,6 +19,7 @@ export default function MessageContextMenu({
   onClose,
   onCopy,
   onShowRawEmail,
+  onReparse,
 }: MessageContextMenuProps) {
   React.useEffect(() => {
     const handleClick = () => onClose()
@@ -59,6 +61,21 @@ export default function MessageContextMenu({
         <Copy className="h-4 w-4" />
         <span>Kopieren</span>
       </button>
+      {!message.isOwn && onReparse && (
+        <>
+          <hr className="border-gray-100 opacity-50" />
+          <button
+            onClick={() => {
+              onReparse(message.id)
+              onClose()
+            }}
+            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+          >
+            <RotateCcw className="h-4 w-4" />
+            <span>Neu verarbeiten</span>
+          </button>
+        </>
+      )}
       {!message.isOwn && onShowRawEmail && (
         <>
           <hr className="border-gray-100 opacity-50" />

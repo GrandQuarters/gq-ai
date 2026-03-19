@@ -276,6 +276,24 @@ export default function AdminChatPage() {
     }
   }
 
+  const handleReparse = async (messageId: string) => {
+    try {
+      const result = await apiService.reparseMessage(messageId)
+      if (selectedConversation) {
+        setMessages((prev) => ({
+          ...prev,
+          [selectedConversation.id]: (prev[selectedConversation.id] || []).map((msg) =>
+            msg.id === messageId
+              ? { ...msg, content: result.content, originalContent: result.originalContent }
+              : msg
+          ),
+        }))
+      }
+    } catch (error) {
+      console.error('❌ Failed to reparse message:', error)
+    }
+  }
+
   const handleAttachImage = (file: File) => {
     if (!selectedConversation) return
     const url = URL.createObjectURL(file)
@@ -519,6 +537,7 @@ export default function AdminChatPage() {
           message={contextMenu.message}
           onClose={() => setContextMenu(null)}
           onCopy={handleCopy}
+          onReparse={handleReparse}
           onShowRawEmail={handleShowRawEmail}
         />
       )}
