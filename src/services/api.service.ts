@@ -104,6 +104,13 @@ export class ApiService {
     return data.aiSuggestion || null;
   }
 
+  async getPendingAiIds(): Promise<string[]> {
+    const response = await fetch(`${API_URL}/pending-ai-ids`);
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+  }
+
   async getActionRequiredIds(): Promise<string[]> {
     const response = await fetch(`${API_URL}/action-required`);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);

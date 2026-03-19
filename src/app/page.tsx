@@ -75,6 +75,9 @@ export default function AdminChatPage() {
         if (Array.isArray(actionIds)) {
           setActionRequiredIds(actionIds)
         }
+
+        const aiIds = await apiService.getPendingAiIds()
+        setPendingAiIds(aiIds)
         
         console.log('✅ Loaded conversations from backend:', backendConversations.length)
       } catch (error) {
@@ -86,13 +89,17 @@ export default function AdminChatPage() {
 
     loadConversations()
 
-    // Poll conversations every 15 seconds for silent background refresh
+    // Poll conversations + pending AI IDs every 15 seconds for silent background refresh
     const pollInterval = setInterval(async () => {
       try {
-        const backendConversations = await apiService.getConversations()
+        const [backendConversations, aiIds] = await Promise.all([
+          apiService.getConversations(),
+          apiService.getPendingAiIds(),
+        ])
         if (Array.isArray(backendConversations)) {
           setConversations(backendConversations as Conversation[])
         }
+        setPendingAiIds(aiIds)
       } catch {
         // silently ignore poll errors
       }
