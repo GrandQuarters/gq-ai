@@ -35,7 +35,7 @@ export default function MessageInput({
   onSend,
   onAttachImage,
   disabled = false,
-  placeholder = "Nachricht eingeben... (Shift+Enter für neue Zeile)",
+  placeholder = "Nachricht eingeben...",
   aiSuggestion = null,
   actionRequired = null,
   onAISuggestionVisibilityChange,
@@ -92,9 +92,7 @@ export default function MessageInput({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(e)
     }
-    // Shift+Enter: do nothing, browser inserts newline naturally
   }
 
   const insertEmoji = (emoji: string) => {
