@@ -137,8 +137,24 @@ export class ApiService {
     return response.json();
   }
 
-  async deleteAdminUser(userId: string): Promise<void> {
-    const response = await fetch(`${API_URL}/admin/users/${userId}`, { method: 'DELETE' });
+  async deleteAdminUser(userId: string, password?: string, email?: string): Promise<void> {
+    const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password, email }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: 'Failed' }));
+      throw new Error(err.error || `HTTP ${response.status}`);
+    }
+  }
+
+  async changeAdminPassword(userId: string, email: string, oldPassword: string, newPassword: string): Promise<void> {
+    const response = await fetch(`${API_URL}/admin/users/${userId}/change-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, oldPassword, newPassword }),
+    });
     if (!response.ok) {
       const err = await response.json().catch(() => ({ error: 'Failed' }));
       throw new Error(err.error || `HTTP ${response.status}`);
