@@ -118,6 +118,33 @@ export class ApiService {
     return Array.isArray(data) ? data : [];
   }
 
+  async getAdminUsers(): Promise<{ id: string; email: string; name: string; created_at: string; last_sign_in_at: string | null }[]> {
+    const response = await fetch(`${API_URL}/admin/users`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.json();
+  }
+
+  async createAdminUser(email: string, password: string, name: string): Promise<any> {
+    const response = await fetch(`${API_URL}/admin/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, name }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: 'Failed' }));
+      throw new Error(err.error || `HTTP ${response.status}`);
+    }
+    return response.json();
+  }
+
+  async deleteAdminUser(userId: string): Promise<void> {
+    const response = await fetch(`${API_URL}/admin/users/${userId}`, { method: 'DELETE' });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: 'Failed' }));
+      throw new Error(err.error || `HTTP ${response.status}`);
+    }
+  }
+
   connectWebSocket(onMessage: (data: any) => void): WebSocket {
     if (this.ws) {
       this.ws.close();

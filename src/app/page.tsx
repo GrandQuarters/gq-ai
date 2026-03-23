@@ -11,6 +11,7 @@ import MessageContextMenu from "@/components/chat/MessageContextMenu"
 import ToastNotification from "@/components/chat/ToastNotification"
 import ImageViewer from "@/components/chat/ImageViewer"
 import ApartmentDetails, { type BookingData } from "@/components/chat/ApartmentDetails"
+import AdminPanel from "@/components/chat/AdminPanel"
 import type { Conversation, Message, ContextMenuPosition, ToastNotification as ToastType } from "@/types/chat"
 import { mockConversations, mockMessages, generateId } from "@/data/mockData"
 import { apiService } from "@/services/api.service"
@@ -32,7 +33,9 @@ export default function AdminChatPage() {
   const [showMobileChat, setShowMobileChat] = useState(false)
   const [currentAISuggestion, setCurrentAISuggestion] = useState<string | null>(null)
   const [rawEmailData, setRawEmailData] = useState<Record<string, any> | null>(null)
-  
+  const [showAdminPanel, setShowAdminPanel] = useState(false)
+  const [currentUserEmail, setCurrentUserEmail] = useState("")
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -45,6 +48,7 @@ export default function AdminChatPage() {
         router.replace("/login")
       } else {
         setAuthReady(true)
+        setCurrentUserEmail(session.user?.email || "")
       }
     })
 
@@ -421,7 +425,7 @@ export default function AdminChatPage() {
           onPin={handlePinConversation}
           onMarkUnread={handleMarkUnread}
           onClearChat={handleClearChat}
-          onNewChat={() => {}}
+          onNewChat={() => setShowAdminPanel(true)}
           actionRequiredIds={actionRequiredIds}
           pendingAiIds={pendingAiIds}
         />
@@ -674,6 +678,14 @@ export default function AdminChatPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Admin Panel */}
+      {showAdminPanel && (
+        <AdminPanel
+          currentUserEmail={currentUserEmail}
+          onClose={() => setShowAdminPanel(false)}
+        />
       )}
     </div>
   )
