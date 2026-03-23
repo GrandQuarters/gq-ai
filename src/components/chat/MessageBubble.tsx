@@ -10,6 +10,7 @@ interface MessageBubbleProps {
   onContextMenu: (e: React.MouseEvent, message: Message) => void
   onImageClick?: (url: string) => void
   onRetryTranslation?: (messageId: string) => Promise<{ content: string; originalContent: string | null }>
+  hideBookingInfo?: boolean
 }
 
 export default function MessageBubble({
@@ -17,6 +18,7 @@ export default function MessageBubble({
   onContextMenu,
   onImageClick,
   onRetryTranslation,
+  hideBookingInfo = false,
 }: MessageBubbleProps) {
   const [showOriginal, setShowOriginal] = useState(false)
   const [translating, setTranslating] = useState(false)
@@ -254,7 +256,7 @@ export default function MessageBubble({
         
         {renderAttachments()}
 
-        {bookingDetails && (
+        {bookingDetails && !hideBookingInfo && (
           <div className="mb-2 rounded-md border border-amber-200 bg-amber-50/60 p-2.5">
             <p className="text-[0.65rem] font-semibold text-amber-800 uppercase tracking-wide mb-1.5">
               Buchungsdetails

@@ -480,15 +480,19 @@ export default function AdminChatPage() {
               className="flex-1 overflow-y-auto p-4 no-scrollbar"
               style={{ paddingBottom: isAISuggestionVisible ? "320px" : "120px" }}
             >
-              {currentMessages.map((message) => (
-                <MessageBubble
-                  key={message.id}
-                  message={message}
-                  onContextMenu={handleContextMenu}
-                  onImageClick={setViewingImage}
-                  onRetryTranslation={(msgId) => apiService.retryTranslation(msgId)}
-                />
-              ))}
+              {(() => {
+                const firstBookingMsgId = currentMessages.find(m => m.content?.includes('[BOOKING_INFO]'))?.id
+                return currentMessages.map((message) => (
+                  <MessageBubble
+                    key={message.id}
+                    message={message}
+                    onContextMenu={handleContextMenu}
+                    onImageClick={setViewingImage}
+                    onRetryTranslation={(msgId) => apiService.retryTranslation(msgId)}
+                    hideBookingInfo={!!firstBookingMsgId && message.id !== firstBookingMsgId}
+                  />
+                ))
+              })()}
               <div ref={messagesEndRef} />
             </div>
 
