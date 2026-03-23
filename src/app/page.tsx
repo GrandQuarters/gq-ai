@@ -482,16 +482,47 @@ export default function AdminChatPage() {
             >
               {(() => {
                 const firstBookingMsgId = currentMessages.find(m => m.content?.includes('[BOOKING_INFO]'))?.id
-                return currentMessages.map((message) => (
-                  <MessageBubble
-                    key={message.id}
-                    message={message}
-                    onContextMenu={handleContextMenu}
-                    onImageClick={setViewingImage}
-                    onRetryTranslation={(msgId) => apiService.retryTranslation(msgId)}
-                    hideBookingInfo={!!firstBookingMsgId && message.id !== firstBookingMsgId}
-                  />
-                ))
+                const dayNames = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']
+                const getDateLabel = (date: Date | string) => {
+                  const d = typeof date === 'string' ? new Date(date) : date
+                  const now = new Date()
+                  const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+                  const msgMid = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+                  const diff = Math.round((todayMid.getTime() - msgMid.getTime()) / (1000 * 60 * 60 * 24))
+                  if (diff === 0) return 'Heute'
+                  if (diff === 1) return 'Gestern'
+                  return `${dayNames[d.getDay()]}, ${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear()}`
+                }
+                const getDateKey = (date: Date | string) => {
+                  const d = typeof date === 'string' ? new Date(date) : date
+                  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+                }
+
+                let lastDateKey = ''
+                return currentMessages.map((message) => {
+                  const msgDateKey = getDateKey(message.timestamp)
+                  const showSeparator = msgDateKey !== lastDateKey
+                  lastDateKey = msgDateKey
+                  return (
+                    <React.Fragment key={message.id}>
+                      {showSeparator && (
+                        <div className="flex items-center justify-center my-3">
+                          <span className="px-3 py-1 rounded-lg text-xs text-gray-500 font-medium"
+                            style={{ backgroundColor: "rgba(0,0,0,0.04)", fontSize: "0.7rem" }}>
+                            {getDateLabel(message.timestamp)}
+                          </span>
+                        </div>
+                      )}
+                      <MessageBubble
+                        message={message}
+                        onContextMenu={handleContextMenu}
+                        onImageClick={setViewingImage}
+                        onRetryTranslation={(msgId) => apiService.retryTranslation(msgId)}
+                        hideBookingInfo={!!firstBookingMsgId && message.id !== firstBookingMsgId}
+                      />
+                    </React.Fragment>
+                  )
+                })
               })()}
               <div ref={messagesEndRef} />
             </div>
