@@ -49,7 +49,12 @@ export default function AdminPanel({ currentUserEmail, onClose }: AdminPanelProp
   useEffect(() => { loadUsers() }, [])
 
   useEffect(() => {
-    const handleClick = () => setMenuOpenId(null)
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (!target.closest("[data-menu-trigger]") && !target.closest("[data-menu-dropdown]")) {
+        setMenuOpenId(null)
+      }
+    }
     document.addEventListener("click", handleClick)
     return () => document.removeEventListener("click", handleClick)
   }, [])
@@ -325,6 +330,7 @@ export default function AdminPanel({ currentUserEmail, onClose }: AdminPanelProp
                       )}
                       <div className="relative">
                         <button
+                          data-menu-trigger
                           onClick={(e) => {
                             e.stopPropagation()
                             setMenuOpenId(menuOpenId === user.id ? null : user.id)
@@ -334,7 +340,7 @@ export default function AdminPanel({ currentUserEmail, onClose }: AdminPanelProp
                           <MoreVertical className="h-4 w-4 text-gray-400" />
                         </button>
                         {menuOpenId === user.id && (
-                          <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-100 z-10 min-w-[180px]"
+                          <div data-menu-dropdown className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-100 z-10 min-w-[180px]"
                             onClick={(e) => e.stopPropagation()}>
                             <button
                               onClick={() => openSubView({ type: "changePassword", user })}
