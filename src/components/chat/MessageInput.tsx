@@ -89,8 +89,8 @@ export default function MessageInput({
     onAISuggestionVisibilityChange?.(false)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+  const handleFormKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
       e.preventDefault()
     }
   }
@@ -146,13 +146,12 @@ export default function MessageInput({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="relative">
+      <form onSubmit={handleSubmit} onKeyDown={handleFormKeyDown} className="relative">
         <textarea
           ref={textareaRef}
           rows={1}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
           className="w-full pl-12 pr-24 py-3 rounded-2xl outline-none text-gray-900 placeholder:text-gray-500 placeholder:text-sm disabled:opacity-50 disabled:cursor-not-allowed no-scrollbar"
