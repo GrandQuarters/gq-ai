@@ -89,12 +89,6 @@ export default function MessageInput({
     onAISuggestionVisibilityChange?.(false)
   }
 
-  const handleFormKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault()
-    }
-  }
-
   const insertEmoji = (emoji: string) => {
     setMessage((prev) => prev + emoji)
   }
@@ -146,7 +140,7 @@ export default function MessageInput({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} onKeyDown={handleFormKeyDown} className="relative">
+      <form onSubmit={handleSubmit} className="relative">
         <textarea
           ref={textareaRef}
           rows={1}
@@ -154,6 +148,7 @@ export default function MessageInput({
           onChange={(e) => setMessage(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
+          enterKeyHint="enter"
           className="w-full pl-12 pr-24 py-3 rounded-2xl outline-none text-gray-900 placeholder:text-gray-500 placeholder:text-sm disabled:opacity-50 disabled:cursor-not-allowed no-scrollbar"
           style={{
             boxShadow: "0 3px 8px rgba(0,0,0,0.18)",
