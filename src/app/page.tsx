@@ -299,6 +299,11 @@ export default function AdminChatPage() {
               : msg
           ),
         }))
+        // Refresh conversations to pick up updated contact name / booking info
+        const convData = await apiService.getConversations()
+        setConversations(convData)
+        const updated = convData.find((c: any) => c.id === selectedConversation.id)
+        if (updated) setSelectedConversation(updated)
       }
     } catch (error) {
       console.error('❌ Failed to reparse message:', error)
