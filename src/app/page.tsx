@@ -532,6 +532,7 @@ export default function AdminChatPage() {
                   )
                 })
               })()}
+              <div style={{ height: "100px" }} />
               <div ref={messagesEndRef} />
               <div style={{ height: "80vh" }} />
             </div>
