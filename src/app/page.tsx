@@ -39,7 +39,7 @@ export default function AdminChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })
   }
 
   useEffect(() => {
@@ -487,7 +487,6 @@ export default function AdminChatPage() {
             {/* Messages */}
             <div 
               className="flex-1 overflow-y-auto p-4 no-scrollbar"
-              style={{ paddingBottom: "0" }}
             >
               {(() => {
                 const firstBookingMsgId = currentMessages.find(m => m.content?.includes('[BOOKING_INFO]'))?.id
