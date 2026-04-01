@@ -35,6 +35,9 @@ export default function AdminChatPage() {
   const [rawEmailData, setRawEmailData] = useState<Record<string, any> | null>(null)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [currentUserEmail, setCurrentUserEmail] = useState("")
+  const [showPmsSync, setShowPmsSync] = useState(false)
+  const [pmsSyncResults, setPmsSyncResults] = useState<any>(null)
+  const [pmsSyncing, setPmsSyncing] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -64,6 +67,22 @@ export default function AdminChatPage() {
   useEffect(() => {
     scrollToBottom()
   }, [selectedConversation, messages])
+
+  // Shift+J+K shortcut for PMS sync
+  useEffect(() => {
+    const pressed = new Set<string>()
+    const onDown = (e: KeyboardEvent) => {
+      pressed.add(e.key.toLowerCase())
+      if (e.shiftKey && pressed.has('j') && pressed.has('k')) {
+        setShowPmsSync(true)
+        setPmsSyncResults(null)
+      }
+    }
+    const onUp = (e: KeyboardEvent) => pressed.delete(e.key.toLowerCase())
+    window.addEventListener('keydown', onDown)
+    window.addEventListener('keyup', onUp)
+    return () => { window.removeEventListener('keydown', onDown); window.removeEventListener('keyup', onUp) }
+  }, [])
 
   // Load conversations from backend on mount
   useEffect(() => {
@@ -285,6 +304,23 @@ export default function AdminChatPage() {
     } catch {
       setRawEmailData({ error: true })
     }
+  }
+
+  const handlePmsSync = async () => {
+    setPmsSyncing(true)
+    setPmsSyncResults(null)
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'}/api/pms/sync-all`, { method: 'POST' })
+      const data = await res.json()
+      setPmsSyncResults(data)
+      if (data.results?.some((r: any) => r.status === 'synced')) {
+        const updated = await apiService.getConversations()
+        setConversations(updated as Conversation[])
+      }
+    } catch (err) {
+      setPmsSyncResults({ error: String(err) })
+    }
+    setPmsSyncing(false)
   }
 
   const handleReparse = async (messageId: string) => {
@@ -705,6 +741,49 @@ export default function AdminChatPage() {
           currentUserEmail={currentUserEmail}
           onClose={() => setShowAdminPanel(false)}
         />
+      )}
+
+      {/* PMS Sync Modal (Shift+J+K) */}
+      {showPmsSync && (
+        <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center" onClick={() => setShowPmsSync(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-[420px] max-h-[80vh] overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-semibold text-gray-900 text-sm">PMS Sync – Booking.com</h3>
+              <button onClick={() => setShowPmsSync(false)} className="text-gray-400 hover:text-gray-600 text-lg">×</button>
+            </div>
+            <div className="p-5">
+              <p className="text-xs text-gray-500 mb-4">
+                Queries the my-bookings.cc API for all Booking.com conversations and updates booking details (check-in/out times, keybox, phone, etc.)
+              </p>
+              <button
+                onClick={handlePmsSync}
+                disabled={pmsSyncing}
+                className="w-full py-2.5 rounded-lg text-sm font-medium text-white transition-all"
+                style={{ background: pmsSyncing ? '#aaa' : 'linear-gradient(135deg, #D4A574, #8B6635)' }}
+              >
+                {pmsSyncing ? 'Syncing...' : 'Sync All Booking.com Guests'}
+              </button>
+              {pmsSyncResults && !pmsSyncResults.error && (
+                <div className="mt-4 space-y-1.5 max-h-[40vh] overflow-y-auto">
+                  <p className="text-xs font-medium text-gray-600 mb-2">
+                    {pmsSyncResults.results?.filter((r: any) => r.status === 'synced').length}/{pmsSyncResults.total} synced
+                  </p>
+                  {pmsSyncResults.results?.map((r: any) => (
+                    <div key={r.id} className="flex items-center justify-between text-xs py-1 px-2 rounded bg-gray-50">
+                      <span className="text-gray-700 truncate mr-2">{r.name}</span>
+                      <span className={`flex-shrink-0 ${r.status === 'synced' ? 'text-green-600' : r.status === 'not_found' ? 'text-orange-500' : 'text-gray-400'}`}>
+                        {r.status === 'synced' ? `✓ ${r.fields} fields` : r.status === 'not_found' ? 'not in PMS' : 'no booking ID'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {pmsSyncResults?.error && (
+                <p className="mt-3 text-xs text-red-500">{pmsSyncResults.error}</p>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
