@@ -35,6 +35,7 @@ export default function AdminChatPage() {
   const [rawEmailData, setRawEmailData] = useState<Record<string, any> | null>(null)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [currentUserEmail, setCurrentUserEmail] = useState("")
+  const [currentUserName, setCurrentUserName] = useState("")
   const [showPmsSync, setShowPmsSync] = useState(false)
   const [pmsSyncResults, setPmsSyncResults] = useState<any>(null)
   const [pmsSyncing, setPmsSyncing] = useState(false)
@@ -52,12 +53,15 @@ export default function AdminChatPage() {
       } else {
         setAuthReady(true)
         setCurrentUserEmail(session.user?.email || "")
+        setCurrentUserName(session.user?.user_metadata?.name || session.user?.email?.split('@')[0] || "Moe")
       }
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
         router.replace("/login")
+      } else {
+        setCurrentUserName(session.user?.user_metadata?.name || session.user?.email?.split('@')[0] || "Moe")
       }
     })
 
@@ -239,7 +243,7 @@ export default function AdminChatPage() {
 
     try {
       // Send via backend API
-      await apiService.sendMessage(selectedConversation.id, content)
+      await apiService.sendMessage(selectedConversation.id, content, currentUserName)
       setCurrentAISuggestion(null)
       setIsAISuggestionVisible(false)
       setPendingAiIds((prev) => prev.filter((id) => id !== selectedConversation.id))

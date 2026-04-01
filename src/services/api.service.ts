@@ -57,13 +57,13 @@ export class ApiService {
     return Array.isArray(data) ? data : [];
   }
 
-  async sendMessage(conversationId: string, content: string): Promise<void> {
+  async sendMessage(conversationId: string, content: string, senderName?: string): Promise<void> {
     const response = await fetch(`${API_URL}/messages/send`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ conversationId, content }),
+      body: JSON.stringify({ conversationId, content, senderName }),
     });
 
     if (!response.ok) {
