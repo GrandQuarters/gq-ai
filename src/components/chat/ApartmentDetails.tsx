@@ -157,8 +157,8 @@ export default function ApartmentDetails({
         backdropFilter: "blur(10px)",
       }}
     >
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <h3 className="font-semibold text-gray-900">Buchungsdetails</h3>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+        <h3 className="font-semibold text-gray-900 text-sm">Buchungsdetails</h3>
         <button
           onClick={onClose}
           className="p-1 hover:bg-gray-100 rounded-full transition-colors"
@@ -167,7 +167,7 @@ export default function ApartmentDetails({
         </button>
       </div>
 
-      <div className="p-4 space-y-3">
+      <div className="px-4 py-3 space-y-2.5">
         {!hasData && (
           <p className="text-sm text-gray-400 italic text-center py-4">
             Keine Buchungsdaten verfügbar
@@ -183,15 +183,35 @@ export default function ApartmentDetails({
             <Home className="h-3.5 w-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
             <div className="min-w-0">
               <p className="text-[11px] text-gray-400">Objekt</p>
-              {bookingData.property && <p className="text-sm text-gray-700 leading-tight">{bookingData.property}</p>}
-              {bookingData.objectNameInternal && <p className="text-xs text-gray-400">{bookingData.objectNameInternal}</p>}
+              <p className="text-sm text-gray-700 leading-tight">
+                {bookingData.property}{bookingData.objectNameInternal && <span className="text-gray-400 text-xs ml-1.5">{bookingData.objectNameInternal}</span>}
+              </p>
             </div>
           </div>
         )}
 
-        {/* Reservation */}
-        {bookingData.reservation && (
-          <DetailRow icon={<Hash className="h-3.5 w-3.5" />} label="Buchungsnr." value={bookingData.reservation} />
+        {/* Buchungsnr + Telefon side by side */}
+        {(bookingData.reservation || bookingData.guestPhone) && (
+          <div className="grid grid-cols-2 gap-2">
+            {bookingData.reservation && (
+              <div className="flex items-start gap-1.5">
+                <Hash className="h-3.5 w-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[11px] text-gray-400">Buchungsnr.</p>
+                  <p className="text-xs text-gray-700">{bookingData.reservation}</p>
+                </div>
+              </div>
+            )}
+            {bookingData.guestPhone && (
+              <div className="flex items-start gap-1.5">
+                <Phone className="h-3.5 w-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[11px] text-gray-400">Telefon</p>
+                  <p className="text-xs text-gray-700 truncate">{bookingData.guestPhone}</p>
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Stay Duration */}
@@ -199,34 +219,34 @@ export default function ApartmentDetails({
           <div className="flex items-start gap-2">
             <Calendar className="h-3.5 w-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-[11px] text-gray-400 mb-1.5">Aufenthalt</p>
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-2 text-sm">
+              <p className="text-[11px] text-gray-400 mb-1">Aufenthalt</p>
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-2">
                 <div className="text-center">
-                  <p className="text-[11px] text-gray-400 mb-0.5">Check-in</p>
+                  <p className="text-[10px] text-gray-400">Check-in</p>
                   {checkIn ? (
                     <>
                       <p className="font-medium text-gray-800 text-xs">{formatDate(checkIn)}</p>
-                      <p className="text-[11px] text-gray-400 mt-0.5">{bookingData.checkinTime || formatTime(checkIn) || '—'}</p>
+                      <p className="text-[10px] text-gray-400">{bookingData.checkinTime || formatTime(checkIn) || '—'}</p>
                     </>
                   ) : (
-                    <p className="text-gray-300">—</p>
+                    <p className="text-gray-300 text-xs">—</p>
                   )}
                 </div>
-                <span className="text-gray-300">→</span>
+                <span className="text-gray-300 text-sm">→</span>
                 <div className="text-center">
-                  <p className="text-[11px] text-gray-400 mb-0.5">Check-out</p>
+                  <p className="text-[10px] text-gray-400">Check-out</p>
                   {checkOut ? (
                     <>
                       <p className="font-medium text-gray-800 text-xs">{formatDate(checkOut)}</p>
-                      <p className="text-[11px] text-gray-400 mt-0.5">{bookingData.checkoutTime || formatTime(checkOut) || '—'}</p>
+                      <p className="text-[10px] text-gray-400">{bookingData.checkoutTime || formatTime(checkOut) || '—'}</p>
                     </>
                   ) : (
-                    <p className="text-gray-300">—</p>
+                    <p className="text-gray-300 text-xs">—</p>
                   )}
                 </div>
               </div>
               {nights !== null && (
-                <p className="text-[11px] text-gray-400 mt-1.5 text-center">{nights} {nights === 1 ? 'Nacht' : 'Nächte'}</p>
+                <p className="text-[10px] text-gray-400 mt-1 text-center">{nights} {nights === 1 ? 'Nacht' : 'Nächte'}</p>
               )}
             </div>
           </div>
@@ -237,7 +257,7 @@ export default function ApartmentDetails({
         {/* Progress Bar */}
         {progress !== null && (
           <div className="ml-5">
-            <div className="flex items-center justify-between text-[11px] text-gray-400 mb-1">
+            <div className="flex items-center justify-between text-[10px] text-gray-400 mb-0.5">
               <span>Fortschritt</span>
               <span>{Math.round(progress)}%</span>
             </div>
@@ -253,27 +273,32 @@ export default function ApartmentDetails({
           </div>
         )}
 
-        {/* Guests - Adults/Children or total */}
-        {(bookingData.adults || bookingData.guests) && (
-          <DetailRow
-            icon={<Users className="h-3.5 w-3.5" />}
-            label="Gäste"
-            value={
-              bookingData.adults
-                ? `${bookingData.adults} Erw.${bookingData.children ? ` + ${bookingData.children} Kinder` : ''}`
-                : bookingData.guests || null
-            }
-          />
-        )}
-
-        {/* Rooms */}
-        {bookingData.rooms && (
-          <DetailRow icon={<Home className="h-3.5 w-3.5" />} label="Zimmer" value={bookingData.rooms} />
-        )}
-
-        {/* Phone */}
-        {bookingData.guestPhone && (
-          <DetailRow icon={<Phone className="h-3.5 w-3.5" />} label="Telefon" value={bookingData.guestPhone} />
+        {/* Gäste + Zimmer side by side */}
+        {(bookingData.adults || bookingData.guests || bookingData.rooms) && (
+          <div className="grid grid-cols-2 gap-2">
+            {(bookingData.adults || bookingData.guests) && (
+              <div className="flex items-start gap-1.5">
+                <Users className="h-3.5 w-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[11px] text-gray-400">Gäste</p>
+                  <p className="text-xs text-gray-700">
+                    {bookingData.adults
+                      ? `${bookingData.adults} Erw.${bookingData.children ? ` + ${bookingData.children} Kind.` : ''}`
+                      : bookingData.guests}
+                  </p>
+                </div>
+              </div>
+            )}
+            {bookingData.rooms && (
+              <div className="flex items-start gap-1.5">
+                <Home className="h-3.5 w-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[11px] text-gray-400">Zimmer</p>
+                  <p className="text-xs text-gray-700">{bookingData.rooms}</p>
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Keybox Code */}
