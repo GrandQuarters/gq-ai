@@ -43,6 +43,18 @@ CREATE TABLE conversations (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   
+  -- PMS data (populated from my-bookings.cc API)
+  booking_number VARCHAR(100),
+  checkin_date VARCHAR(30),
+  checkout_date VARCHAR(30),
+  checkin_time VARCHAR(10),
+  checkout_time VARCHAR(10),
+  keybox_code VARCHAR(50),
+  guest_phone VARCHAR(50),
+  object_name_internal VARCHAR(255),
+  adults INTEGER,
+  children INTEGER,
+
   -- Indexes
   CONSTRAINT conversations_unique_thread UNIQUE (email_thread_id),
   CONSTRAINT conversations_unique_hash UNIQUE (platform_conversation_hash)

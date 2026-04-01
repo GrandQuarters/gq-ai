@@ -475,6 +475,19 @@ export default function AdminChatPage() {
                   } catch { /* skip malformed */ }
                 }
               }
+
+              const conv = selectedConversation as any
+              if (conv.propertyName) bookingData.property = conv.propertyName
+              if (conv.objectNameInternal) bookingData.objectNameInternal = conv.objectNameInternal
+              if (conv.bookingNumber) bookingData.reservation = conv.bookingNumber
+              if (conv.checkinDate && conv.checkoutDate) bookingData.dates = `${conv.checkinDate} – ${conv.checkoutDate}`
+              if (conv.checkinTime) bookingData.checkinTime = conv.checkinTime
+              if (conv.checkoutTime) bookingData.checkoutTime = conv.checkoutTime
+              if (conv.keyboxCode) bookingData.keyboxCode = conv.keyboxCode
+              if (conv.guestPhone) bookingData.guestPhone = conv.guestPhone
+              if (conv.adults) bookingData.adults = conv.adults
+              if (conv.children !== null && conv.children !== undefined) bookingData.children = conv.children
+
               return (
                 <ApartmentDetails
                   bookingData={bookingData}

@@ -1,17 +1,24 @@
 "use client"
 
 import React from "react"
-import { X, MapPin, Calendar, Euro, Users, Home, Hash, User } from "lucide-react"
+import { X, Calendar, Users, Home, Hash, User, Clock, Key, Phone } from "lucide-react"
 
 export interface BookingData {
   guest?: string
   property?: string
+  objectNameInternal?: string
   dates?: string
   guests?: string
   reservation?: string
   rooms?: string
   source?: string
   payment?: string
+  checkinTime?: string
+  checkoutTime?: string
+  keyboxCode?: string
+  guestPhone?: string
+  adults?: number
+  children?: number
 }
 
 interface ApartmentDetailsProps {
@@ -160,7 +167,7 @@ export default function ApartmentDetails({
         </button>
       </div>
 
-      <div className="p-5 space-y-4">
+      <div className="p-4 space-y-3">
         {!hasData && (
           <p className="text-sm text-gray-400 italic text-center py-4">
             Keine Buchungsdaten verfügbar
@@ -168,45 +175,50 @@ export default function ApartmentDetails({
         )}
 
         {/* Guest */}
-        <DetailRow icon={<User className="h-4 w-4" />} label="Gast" value={guestName} />
+        <DetailRow icon={<User className="h-3.5 w-3.5" />} label="Gast" value={guestName} />
 
-        {/* Property */}
-        <DetailRow icon={<Home className="h-4 w-4" />} label="Objekt" value={bookingData.property} />
+        {/* Property + Internal name */}
+        {(bookingData.property || bookingData.objectNameInternal) && (
+          <div className="flex items-start gap-2">
+            <Home className="h-3.5 w-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-[11px] text-gray-400">Objekt</p>
+              {bookingData.property && <p className="text-sm text-gray-700 leading-tight">{bookingData.property}</p>}
+              {bookingData.objectNameInternal && <p className="text-xs text-gray-400">{bookingData.objectNameInternal}</p>}
+            </div>
+          </div>
+        )}
 
         {/* Reservation */}
         {bookingData.reservation && (
-          <DetailRow icon={<Hash className="h-4 w-4" />} label="Buchungsnr." value={bookingData.reservation} />
+          <DetailRow icon={<Hash className="h-3.5 w-3.5" />} label="Buchungsnr." value={bookingData.reservation} />
         )}
 
         {/* Stay Duration */}
         {(checkIn || checkOut) ? (
           <div className="flex items-start gap-2">
-            <Calendar className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+            <Calendar className="h-3.5 w-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-xs text-gray-500 mb-2">Aufenthalt</p>
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-3 text-sm">
+              <p className="text-[11px] text-gray-400 mb-1.5">Aufenthalt</p>
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-2 text-sm">
                 <div className="text-center">
-                  <p className="text-xs text-gray-400 mb-0.5">Check-in</p>
+                  <p className="text-[11px] text-gray-400 mb-0.5">Check-in</p>
                   {checkIn ? (
                     <>
-                      <p className="font-medium text-gray-800">{formatDate(checkIn)}</p>
-                      {formatTime(checkIn) && (
-                        <p className="text-xs text-gray-400 mt-0.5">{formatTime(checkIn)}</p>
-                      )}
+                      <p className="font-medium text-gray-800 text-xs">{formatDate(checkIn)}</p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">{bookingData.checkinTime || formatTime(checkIn) || '—'}</p>
                     </>
                   ) : (
                     <p className="text-gray-300">—</p>
                   )}
                 </div>
-                <span className="text-gray-300 text-lg">→</span>
+                <span className="text-gray-300">→</span>
                 <div className="text-center">
-                  <p className="text-xs text-gray-400 mb-0.5">Check-out</p>
+                  <p className="text-[11px] text-gray-400 mb-0.5">Check-out</p>
                   {checkOut ? (
                     <>
-                      <p className="font-medium text-gray-800">{formatDate(checkOut)}</p>
-                      {formatTime(checkOut) && (
-                        <p className="text-xs text-gray-400 mt-0.5">{formatTime(checkOut)}</p>
-                      )}
+                      <p className="font-medium text-gray-800 text-xs">{formatDate(checkOut)}</p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">{bookingData.checkoutTime || formatTime(checkOut) || '—'}</p>
                     </>
                   ) : (
                     <p className="text-gray-300">—</p>
@@ -214,22 +226,22 @@ export default function ApartmentDetails({
                 </div>
               </div>
               {nights !== null && (
-                <p className="text-xs text-gray-400 mt-2 text-center">{nights} {nights === 1 ? 'Nacht' : 'Nächte'}</p>
+                <p className="text-[11px] text-gray-400 mt-1.5 text-center">{nights} {nights === 1 ? 'Nacht' : 'Nächte'}</p>
               )}
             </div>
           </div>
         ) : (
-          <DetailRow icon={<Calendar className="h-4 w-4" />} label="Aufenthalt" value={bookingData.dates || null} />
+          <DetailRow icon={<Calendar className="h-3.5 w-3.5" />} label="Aufenthalt" value={bookingData.dates || null} />
         )}
 
         {/* Progress Bar */}
         {progress !== null && (
-          <div className="ml-6">
-            <div className="flex items-center justify-between text-xs text-gray-400 mb-1.5">
+          <div className="ml-5">
+            <div className="flex items-center justify-between text-[11px] text-gray-400 mb-1">
               <span>Fortschritt</span>
               <span>{Math.round(progress)}%</span>
             </div>
-            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
@@ -241,19 +253,38 @@ export default function ApartmentDetails({
           </div>
         )}
 
-        {/* Guests */}
-        {bookingData.guests && (
-          <DetailRow icon={<Users className="h-4 w-4" />} label="Gäste" value={bookingData.guests} />
+        {/* Guests - Adults/Children or total */}
+        {(bookingData.adults || bookingData.guests) && (
+          <DetailRow
+            icon={<Users className="h-3.5 w-3.5" />}
+            label="Gäste"
+            value={
+              bookingData.adults
+                ? `${bookingData.adults} Erw.${bookingData.children ? ` + ${bookingData.children} Kinder` : ''}`
+                : bookingData.guests || null
+            }
+          />
         )}
 
         {/* Rooms */}
         {bookingData.rooms && (
-          <DetailRow icon={<Home className="h-4 w-4" />} label="Zimmer" value={bookingData.rooms} />
+          <DetailRow icon={<Home className="h-3.5 w-3.5" />} label="Zimmer" value={bookingData.rooms} />
         )}
 
-        {/* Source */}
-        {bookingData.source && (
-          <DetailRow icon={<MapPin className="h-4 w-4" />} label="Plattform" value={bookingData.source} />
+        {/* Phone */}
+        {bookingData.guestPhone && (
+          <DetailRow icon={<Phone className="h-3.5 w-3.5" />} label="Telefon" value={bookingData.guestPhone} />
+        )}
+
+        {/* Keybox Code */}
+        {bookingData.keyboxCode && (
+          <div className="flex items-start gap-2">
+            <Key className="h-3.5 w-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-[11px] text-gray-400">Schlüsselbox</p>
+              <p className="text-sm text-gray-700 font-mono tracking-wider">{bookingData.keyboxCode}</p>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -264,8 +295,8 @@ function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: strin
   return (
     <div className="flex items-start gap-2">
       <span className="text-gray-400 mt-0.5 flex-shrink-0">{icon}</span>
-      <div>
-        <p className="text-xs text-gray-500 mb-0.5">{label}</p>
+      <div className="min-w-0">
+        <p className="text-[11px] text-gray-400">{label}</p>
         {value ? (
           <p className="text-sm text-gray-700">{value}</p>
         ) : (

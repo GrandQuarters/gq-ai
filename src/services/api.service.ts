@@ -14,6 +14,17 @@ export interface BackendConversation {
   pinned: boolean;
   online: boolean;
   readOnly: boolean;
+  propertyName?: string | null;
+  bookingNumber?: string | null;
+  checkinDate?: string | null;
+  checkoutDate?: string | null;
+  checkinTime?: string | null;
+  checkoutTime?: string | null;
+  keyboxCode?: string | null;
+  guestPhone?: string | null;
+  objectNameInternal?: string | null;
+  adults?: number | null;
+  children?: number | null;
 }
 
 export interface BackendMessage {
