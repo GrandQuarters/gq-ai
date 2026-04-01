@@ -14,6 +14,7 @@ interface MessageInputProps {
   aiSuggestion?: string | null
   actionRequired?: string | null
   onAISuggestionVisibilityChange?: (visible: boolean) => void
+  senderFirstName?: string
 }
 
 const EMOJI_LIST = [
@@ -39,6 +40,7 @@ export default function MessageInput({
   aiSuggestion = null,
   actionRequired = null,
   onAISuggestionVisibilityChange,
+  senderFirstName = "Moe",
 }: MessageInputProps) {
   const [message, setMessage] = useState("")
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
@@ -78,7 +80,7 @@ export default function MessageInput({
 
   const handleAcceptSuggestion = () => {
     if (aiSuggestion) {
-      setMessage(aiSuggestion)
+      setMessage(aiSuggestion.replace(/\{Name\}/g, senderFirstName))
       setShowAISuggestion(false)
       onAISuggestionVisibilityChange?.(false)
     }

@@ -598,6 +598,7 @@ export default function AdminChatPage() {
                 aiSuggestion={!actionRequiredIds.includes(selectedConversation.id) ? currentAISuggestion : null}
                 actionRequired={actionRequiredIds.includes(selectedConversation.id) ? "Handlung erforderlich - Bitte antworten" : null}
                 onAISuggestionVisibilityChange={setIsAISuggestionVisible}
+                senderFirstName={currentUserName.split(' ')[0]}
               />
             )}
 
