@@ -39,6 +39,8 @@ export default function AdminChatPage() {
   const [showPmsSync, setShowPmsSync] = useState(false)
   const [pmsSyncResults, setPmsSyncResults] = useState<any>(null)
   const [pmsSyncing, setPmsSyncing] = useState(false)
+  const [trainingCleanResults, setTrainingCleanResults] = useState<any>(null)
+  const [trainingCleaning, setTrainingCleaning] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -325,6 +327,19 @@ export default function AdminChatPage() {
       setPmsSyncResults({ error: String(err) })
     }
     setPmsSyncing(false)
+  }
+
+  const handleTrainingCleanup = async () => {
+    setTrainingCleaning(true)
+    setTrainingCleanResults(null)
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'}/api/training/clean-guest-messages`, { method: 'POST' })
+      const data = await res.json()
+      setTrainingCleanResults(data)
+    } catch (err) {
+      setTrainingCleanResults({ error: String(err) })
+    }
+    setTrainingCleaning(false)
   }
 
   const handleReparse = async (messageId: string) => {
@@ -773,6 +788,18 @@ export default function AdminChatPage() {
               >
                 {pmsSyncing ? 'Syncing...' : 'Sync All Booking.com Guests'}
               </button>
+              <div className="h-px bg-gray-100 my-4" />
+              <p className="text-xs text-gray-500 mb-3">
+                Clean old AI training guest messages by removing BOOKING_INFO JSON blocks. Rows are never deleted.
+              </p>
+              <button
+                onClick={handleTrainingCleanup}
+                disabled={trainingCleaning}
+                className="w-full py-2.5 rounded-lg text-sm font-medium text-white transition-all"
+                style={{ background: trainingCleaning ? '#aaa' : 'linear-gradient(135deg, #64748b, #334155)' }}
+              >
+                {trainingCleaning ? 'Cleaning...' : 'Clean Old AI Training Messages'}
+              </button>
               {pmsSyncResults && !pmsSyncResults.error && (
                 <div className="mt-4 space-y-1.5 max-h-[40vh] overflow-y-auto">
                   <p className="text-xs font-medium text-gray-600 mb-2">
@@ -790,6 +817,18 @@ export default function AdminChatPage() {
               )}
               {pmsSyncResults?.error && (
                 <p className="mt-3 text-xs text-red-500">{pmsSyncResults.error}</p>
+              )}
+              {trainingCleanResults && !trainingCleanResults.error && (
+                <div className="mt-3 text-xs text-gray-600 bg-gray-50 rounded px-2 py-2">
+                  cleaned: {trainingCleanResults.updated} / {trainingCleanResults.total}
+                  <span className="mx-2">|</span>
+                  unchanged: {trainingCleanResults.unchanged}
+                  <span className="mx-2">|</span>
+                  empty-skip: {trainingCleanResults.empty_after_clean}
+                </div>
+              )}
+              {trainingCleanResults?.error && (
+                <p className="mt-3 text-xs text-red-500">{trainingCleanResults.error}</p>
               )}
             </div>
           </div>
