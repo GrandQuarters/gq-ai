@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Phone, Video, Info, ArrowLeft, Sparkles, LogOut } from "lucide-react"
+import { Phone, Video, Info, ArrowLeft, Sparkles, LogOut, GitMerge } from "lucide-react"
 import type { Conversation } from "@/types/chat"
 
 interface ChatHeaderProps {
@@ -10,6 +10,7 @@ interface ChatHeaderProps {
   onBackClick?: () => void
   onLogout?: () => void
   onGenerateAI?: () => Promise<void>
+  isMergedStream?: boolean
 }
 
 export default function ChatHeader({
@@ -18,6 +19,7 @@ export default function ChatHeader({
   onBackClick,
   onLogout,
   onGenerateAI,
+  isMergedStream = false,
 }: ChatHeaderProps) {
   const [generating, setGenerating] = useState(false)
 
@@ -88,7 +90,15 @@ export default function ChatHeader({
         {/* Name & Status */}
         <div>
           <h2 className="font-semibold text-gray-900">{conversation.name}</h2>
-          <p className="text-xs text-gray-500">{participantText}</p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-xs text-gray-500">{participantText}</p>
+            {isMergedStream && (
+              <span className="flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(217,119,6,0.1)', color: '#92400e' }}>
+                <GitMerge className="h-2.5 w-2.5" />
+                <span style={{ fontSize: '0.65rem' }}>merged</span>
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

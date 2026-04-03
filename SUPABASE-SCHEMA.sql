@@ -15,6 +15,7 @@ CREATE TABLE contacts (
   email VARCHAR(255),
   phone_number VARCHAR(50),
   avatar TEXT NOT NULL,
+  booking_url VARCHAR(500),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_message_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   
@@ -26,6 +27,8 @@ CREATE INDEX idx_contacts_email ON contacts(email) WHERE email IS NOT NULL;
 CREATE INDEX idx_contacts_phone ON contacts(phone_number) WHERE phone_number IS NOT NULL;
 CREATE INDEX idx_contacts_platform ON contacts(platform);
 CREATE INDEX idx_contacts_last_message ON contacts(last_message_at DESC);
+CREATE INDEX idx_contacts_booking_url ON contacts(booking_url) WHERE booking_url IS NOT NULL;
+CREATE INDEX idx_contacts_airbnb_booking_url ON contacts(booking_url) WHERE platform = 'airbnb' AND booking_url IS NOT NULL;
 
 -- ==========================================
 -- CONVERSATIONS TABLE

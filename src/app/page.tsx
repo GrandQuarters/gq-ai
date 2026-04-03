@@ -485,6 +485,11 @@ export default function AdminChatPage() {
               onInfoClick={() => setShowApartmentDetails(!showApartmentDetails)}
               onBackClick={() => setShowMobileChat(false)}
               onLogout={handleLogout}
+              isMergedStream={(() => {
+                const convMessages = messages[selectedConversation.id] || []
+                const guestSenderIds = new Set(convMessages.filter(m => !m.isOwn).map(m => m.senderId))
+                return guestSenderIds.size > 1
+              })()}
               onGenerateAI={async () => {
                 try {
                   const suggestion = await apiService.generateAiResponse(selectedConversation.id)
