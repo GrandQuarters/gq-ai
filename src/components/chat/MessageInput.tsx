@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from "react"
-import { Send, Paperclip, Smile, Image, FileText, X } from "lucide-react"
+import { Send, Paperclip, Smile, Image, FileText, X, Sparkles, ChevronDown } from "lucide-react"
 import AISuggestion from "./AISuggestion"
 import ActionRequiredAlert from "./ActionRequiredAlert"
 import type { Message } from "@/types/chat"
@@ -112,21 +112,46 @@ export default function MessageInput({
       )}
 
       {/* AI Suggestion */}
-      {!actionRequired && aiSuggestion && showAISuggestion && (
-        <AISuggestion
-          suggestion={aiSuggestion}
-          onAccept={handleAcceptSuggestion}
-          onDismiss={handleDismissSuggestion}
-        />
-      )}
-
-      {/* AI Suggestion Loading */}
-      {!actionRequired && !aiSuggestion && aiSuggestionLoading && (
+      {!actionRequired && showAISuggestion && (aiSuggestion || aiSuggestionLoading) && (
         <div
-          className="mb-2 px-4 py-2 rounded-xl text-sm text-gray-600 border border-gray-200 bg-white/95"
-          style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.08)" }}
+          style={{
+            opacity: aiSuggestion ? 1 : 0.4,
+            transition: "opacity 0.3s ease",
+            pointerEvents: aiSuggestion ? "auto" : "none",
+          }}
         >
-          KI Vorschlag wird geladen...
+          {aiSuggestion ? (
+            <AISuggestion
+              suggestion={aiSuggestion}
+              onAccept={handleAcceptSuggestion}
+              onDismiss={handleDismissSuggestion}
+            />
+          ) : (
+            <div
+              className="mb-3 mx-4 rounded-2xl border-2 flex items-center gap-3 px-4 py-3 backdrop-blur-sm"
+              style={{
+                borderColor: "rgba(217, 119, 6, 0.6)",
+                backgroundColor: "rgba(254, 243, 199, 0.15)",
+              }}
+            >
+              <div
+                className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+                style={{
+                  background: "linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(217, 119, 6, 0.2))",
+                  border: "1.5px solid rgba(217, 119, 6, 0.4)",
+                }}
+              >
+                <Sparkles className="h-4 w-4" style={{ color: "#d97706" }} />
+              </div>
+              <div className="flex-1 min-w-0" />
+              <div
+                className="flex-shrink-0 w-8 h-8 rounded-full"
+                style={{
+                  background: "linear-gradient(135deg, #fbbf24, #d97706)",
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 
