@@ -13,6 +13,7 @@ interface MessageInputProps {
   placeholder?: string
   aiSuggestion?: string | null
   actionRequired?: string | null
+  aiSuggestionLoading?: boolean
   onAISuggestionVisibilityChange?: (visible: boolean) => void
   senderFirstName?: string
 }
@@ -39,6 +40,7 @@ export default function MessageInput({
   placeholder = "Nachricht eingeben...",
   aiSuggestion = null,
   actionRequired = null,
+  aiSuggestionLoading = false,
   onAISuggestionVisibilityChange,
   senderFirstName = "Moe",
 }: MessageInputProps) {
@@ -116,6 +118,16 @@ export default function MessageInput({
           onAccept={handleAcceptSuggestion}
           onDismiss={handleDismissSuggestion}
         />
+      )}
+
+      {/* AI Suggestion Loading */}
+      {!actionRequired && !aiSuggestion && aiSuggestionLoading && (
+        <div
+          className="mb-2 px-4 py-2 rounded-xl text-sm text-gray-600 border border-gray-200 bg-white/95"
+          style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.08)" }}
+        >
+          KI Vorschlag wird geladen...
+        </div>
       )}
 
       {/* Emoji Picker */}

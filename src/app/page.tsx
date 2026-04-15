@@ -31,7 +31,8 @@ export default function AdminChatPage() {
   const [actionRequiredIds, setActionRequiredIds] = useState<string[]>([])
   const [pendingAiIds, setPendingAiIds] = useState<string[]>([])
   const [showMobileChat, setShowMobileChat] = useState(false)
-  const [currentAISuggestion, setCurrentAISuggestion] = useState<string | null>(null)
+  const [aiSuggestionsByConversation, setAiSuggestionsByConversation] = useState<Record<string, string | null>>({})
+  const [aiLoadingByConversation, setAiLoadingByConversation] = useState<Record<string, boolean>>({})
   const [rawEmailData, setRawEmailData] = useState<Record<string, any> | null>(null)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [currentUserEmail, setCurrentUserEmail] = useState("")
@@ -184,9 +185,12 @@ export default function AdminChatPage() {
           }
         })
 
-        // Set AI suggestion
+        // Set AI suggestion for the specific conversation only
         if (data.aiSuggestion) {
-          setCurrentAISuggestion(data.aiSuggestion)
+          setAiSuggestionsByConversation((prev) => ({
+            ...prev,
+            [data.conversation.id]: data.aiSuggestion,
+          }))
           setIsAISuggestionVisible(true)
           setPendingAiIds((prev) => [...new Set([...prev, data.conversation.id])])
         }
@@ -217,6 +221,7 @@ export default function AdminChatPage() {
 
     // Load messages from backend and mark as read
     try {
+      setAiLoadingByConversation((prev) => ({ ...prev, [conversation.id]: true }))
       const backendMessages = await apiService.getMessages(conversation.id)
       setMessages((prev) => ({
         ...prev,
@@ -228,15 +233,23 @@ export default function AdminChatPage() {
       // Load pending AI suggestion if available
       const pendingSuggestion = await apiService.getPendingAiSuggestion(conversation.id)
       if (pendingSuggestion) {
-        setCurrentAISuggestion(pendingSuggestion)
+        setAiSuggestionsByConversation((prev) => ({
+          ...prev,
+          [conversation.id]: pendingSuggestion,
+        }))
         setIsAISuggestionVisible(true)
         setPendingAiIds((prev) => [...new Set([...prev, conversation.id])])
       } else {
-        setCurrentAISuggestion(null)
+        setAiSuggestionsByConversation((prev) => ({
+          ...prev,
+          [conversation.id]: null,
+        }))
         setIsAISuggestionVisible(false)
       }
     } catch (error) {
       console.error('❌ Failed to load messages:', error)
+    } finally {
+      setAiLoadingByConversation((prev) => ({ ...prev, [conversation.id]: false }))
     }
   }
 
@@ -246,7 +259,10 @@ export default function AdminChatPage() {
     try {
       // Send via backend API
       await apiService.sendMessage(selectedConversation.id, content, currentUserName)
-      setCurrentAISuggestion(null)
+      setAiSuggestionsByConversation((prev) => ({
+        ...prev,
+        [selectedConversation.id]: null,
+      }))
       setIsAISuggestionVisible(false)
       setPendingAiIds((prev) => prev.filter((id) => id !== selectedConversation.id))
 
@@ -279,8 +295,11 @@ export default function AdminChatPage() {
       // Remove from action required list when responding
       setActionRequiredIds((prev) => prev.filter((id) => id !== selectedConversation.id))
       
-      // Clear AI suggestion
-      setCurrentAISuggestion(null)
+      // Clear AI suggestion for current conversation only
+      setAiSuggestionsByConversation((prev) => ({
+        ...prev,
+        [selectedConversation.id]: null,
+      }))
 
       console.log('✅ Message sent via backend')
     } catch (error) {
@@ -464,6 +483,12 @@ export default function AdminChatPage() {
   const currentMessages = selectedConversation
     ? messages[selectedConversation.id] || []
     : []
+  const selectedAiSuggestion = selectedConversation
+    ? aiSuggestionsByConversation[selectedConversation.id] ?? null
+    : null
+  const selectedAiLoading = selectedConversation
+    ? !!aiLoadingByConversation[selectedConversation.id]
+    : false
 
   if (!authReady) {
     return (
@@ -506,14 +531,26 @@ export default function AdminChatPage() {
                 return guestSenderIds.size > 1
               })()}
               onGenerateAI={async () => {
+                if (!selectedConversation) return
+                setAiLoadingByConversation((prev) => ({ ...prev, [selectedConversation.id]: true }))
                 try {
                   const suggestion = await apiService.generateAiResponse(selectedConversation.id)
                   if (suggestion) {
-                    setCurrentAISuggestion(suggestion)
+                    setAiSuggestionsByConversation((prev) => ({
+                      ...prev,
+                      [selectedConversation.id]: suggestion,
+                    }))
                     setIsAISuggestionVisible(true)
+                  } else {
+                    setAiSuggestionsByConversation((prev) => ({
+                      ...prev,
+                      [selectedConversation.id]: null,
+                    }))
                   }
                 } catch (error) {
                   console.error('❌ Failed to generate AI response:', error)
+                } finally {
+                  setAiLoadingByConversation((prev) => ({ ...prev, [selectedConversation.id]: false }))
                 }
               }}
             />
@@ -615,7 +652,8 @@ export default function AdminChatPage() {
               <MessageInput
                 onSend={handleSendMessage}
                 onAttachImage={handleAttachImage}
-                aiSuggestion={!actionRequiredIds.includes(selectedConversation.id) ? currentAISuggestion : null}
+                aiSuggestion={!actionRequiredIds.includes(selectedConversation.id) ? selectedAiSuggestion : null}
+                aiSuggestionLoading={!actionRequiredIds.includes(selectedConversation.id) ? selectedAiLoading : false}
                 actionRequired={actionRequiredIds.includes(selectedConversation.id) ? "Handlung erforderlich - Bitte antworten" : null}
                 onAISuggestionVisibilityChange={setIsAISuggestionVisible}
                 senderFirstName={currentUserName.split(' ')[0]}
