@@ -136,7 +136,7 @@ export default function AdminChatPage() {
     }, 15000)
 
     // Set up WebSocket for real-time updates
-    const ws = apiService.connectWebSocket((data) => {
+    apiService.connectWebSocket((data) => {
       if (data.type === 'new_message') {
         console.log('📨 New message via WebSocket:', data)
         
@@ -319,7 +319,7 @@ export default function AdminChatPage() {
 
   const handleShowRawEmail = async (messageId: string) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'}/api/messages/${messageId}/raw`)
+      const res = await apiService.request(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'}/api/messages/${messageId}/raw`)
       const data = await res.json()
       if (data.hasRawData === false) {
         setRawEmailData({ noData: true })
@@ -335,7 +335,7 @@ export default function AdminChatPage() {
     setPmsSyncing(true)
     setPmsSyncResults(null)
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'}/api/pms/sync-all`, { method: 'POST' })
+      const res = await apiService.request(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'}/api/pms/sync-all`, { method: 'POST' })
       const data = await res.json()
       setPmsSyncResults(data)
       if (data.results?.some((r: any) => r.status === 'synced')) {
@@ -352,7 +352,7 @@ export default function AdminChatPage() {
     setTrainingCleaning(true)
     setTrainingCleanResults(null)
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'}/api/training/clean-guest-messages`, { method: 'POST' })
+      const res = await apiService.request(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'}/api/training/clean-guest-messages`, { method: 'POST' })
       const data = await res.json()
       setTrainingCleanResults(data)
     } catch (err) {
